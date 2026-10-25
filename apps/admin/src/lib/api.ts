@@ -1,6 +1,8 @@
 // Thin fetch wrapper for the PrimeCabs API. Errors always come back as ApiError.
 
-const BASE = `${import.meta.env.VITE_API_URL ?? ""}/api/v1`;
+// Empty in development (Vite proxies /api). On Render it may be a bare hostname, so add https://.
+const RAW_API = (import.meta.env.VITE_API_URL ?? "").replace(/\/$/, "");
+const BASE = `${RAW_API && !/^https?:\/\//.test(RAW_API) ? `https://${RAW_API}` : RAW_API}/api/v1`;
 const TOKEN_KEY = "pc_admin_token";
 
 export class ApiError extends Error {

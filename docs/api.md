@@ -13,7 +13,7 @@ Sign-in returns a JWT. Send it as `Authorization: Bearer <token>`. Customer and 
 ## Auth
 | Method | Path | Body | Notes |
 |---|---|---|---|
-| POST | /auth/otp/request | `{phone, app: customer\|driver}` | 6-digit code, 5 min expiry, 30 s resend, 5 per hour. `devCode` is returned in development only. |
+| POST | /auth/otp/request | `{phone, app: customer\|driver}` | 6-digit code, 5 min expiry, 30 s resend, 5 per hour. `devCode` is returned only while the fake SMS sender is on and `NODE_ENV` is not `production` (development and staging). |
 | POST | /auth/otp/verify | `{phone, otp, app}` | → `{token, user, isNewUser, profileComplete}`. 5 tries. A phone number belongs to one app only. |
 | POST | /auth/refresh | — | New token |
 | POST | /auth/admin/login | `{email, password}` | Locks for 15 min after 5 failures |
@@ -53,6 +53,7 @@ Sign-in returns a JWT. Send it as `Authorization: Bearer <token>`. Customer and 
 | POST | /driver/rides/:id/passengers/:pid/no-show | After departure time |
 | POST | /driver/rides/:id/complete | When nobody is waiting or on board |
 | GET | /driver/earnings | Last 7 and 30 days, upcoming |
+| GET | /driver/reference-fare?routeId&vehicleId&seatFare? | Admin reference fare for the route and vehicle type, and a per-seat breakdown at the proposed fare (customer pays, GST, PrimeCabs fee, driver keeps), from the same pricing code as bookings |
 
 ## Admin (admin token; role checked on every call)
 | Area | Endpoints | Who |
@@ -71,3 +72,6 @@ Location admins only see drivers whose home city is in their cities, and rides a
 
 ## Webhook
 `POST /webhooks/razorpay`: header `x-razorpay-signature`, handles `payment.captured` and `payment.failed`.
+
+## Browser apps (CORS)
+Allowed origins come from `CORS_ORIGINS` (comma-separated; a bare hostname gets `https://`). Allowed methods: GET, HEAD, POST, PUT. Phone apps are not affected by CORS.

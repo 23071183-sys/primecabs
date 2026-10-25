@@ -1,7 +1,7 @@
 import cors from "@fastify/cors";
 import rateLimit from "@fastify/rate-limit";
 import Fastify, { type FastifyError } from "fastify";
-import { config } from "./config.js";
+import { config, parseOrigins } from "./config.js";
 import { AppError } from "./errors.js";
 import { authPlugin } from "./plugins/auth.js";
 import { adminRoutes } from "./routes/admin.js";
@@ -36,7 +36,7 @@ export async function buildApp() {
   app.setNotFoundHandler((_req, reply) => reply.status(404).send({ error: { code: "NOT_FOUND", message: "Not found" } }));
 
   await app.register(cors, {
-    origin: c.CORS_ORIGINS.split(",").map((s) => s.trim()).filter(Boolean),
+    origin: parseOrigins(c.CORS_ORIGINS),
     credentials: false,
     // The default is GET, HEAD and POST only; the apps also save with PUT.
     methods: ["GET", "HEAD", "POST", "PUT"],

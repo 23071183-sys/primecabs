@@ -17,7 +17,6 @@
     "typecheck": "npm -w @primecabs/api run typecheck && npm -w @primecabs/admin run typecheck",
     "admin:dev": "npm -w @primecabs/admin run dev",
     "admin:build": "npm -w @primecabs/admin run build",
-    "postinstall": "npm -w @primecabs/api exec prisma generate",
     "driver:start": "npm -w @primecabs/driver run start",
     "driver:web": "npm -w @primecabs/driver run web"
   },

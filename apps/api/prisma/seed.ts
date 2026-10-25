@@ -6,6 +6,12 @@ import { mkdir, writeFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import { defaultSettings, settingKeys } from "../src/domain/settings.js";
 
+// Locally, settings come from apps/api/.env; on Render they are environment variables.
+try {
+  process.loadEnvFile(new URL("../.env", import.meta.url));
+} catch {
+  // no .env file: use the environment as it is
+}
 const prisma = new PrismaClient();
 const rupees = (r: number) => r * 100;
 

@@ -1,0 +1,114 @@
+# Render Blueprint for PrimeCabs (https://render.com/docs/blueprint-spec).
+# Creates: the API (Starter, Singapore) with a disk for driver documents, a Postgres database,
+# and the admin portal as a static site. Secrets marked `sync: false` are typed into Render's
+# dashboard when the Blueprint is created; they are never stored in git.
+# See docs/deploy.md for the step-by-step guide.
+
+services:
+  - type: web
+    name: primecabs-api
+    runtime: node
+    region: singapore
+    plan: starter
+    branch: main
+    autoDeploy: true
+    # Install only the API workspace (skips the Expo apps), then compile TypeScript.
+    buildCommand: npm ci --workspace=@primecabs/api --include-workspace-root --include=dev && npm -w @primecabs/api run build
+    # Runs before each deploy goes live: apply database migrations, then the idempotent seed.
+    preDeployCommand: npm -w @primecabs/api run db:deploy && npm -w @primecabs/api run db:seed
+    startCommand: npm -w @primecabs/api start
+    healthCheckPath: /health
+    disk:
+      name: documents
+      mountPath: /var/data
+      sizeGB: 1
+    envVars:
+      - key: NODE_VERSION
+        value: "24"
+      # staging: fake SMS and payments allowed, sign-in codes are returned to the app.
+      # Switch to production only after MSG91 and Razorpay are configured.
+      - key: NODE_ENV
+        value: staging
+      - key: DATABASE_URL
+        fromDatabase:
+          name: primecabs-db
+          property: connectionString
+      - key: JWT_SECRET
+        generateValue: true
+      - key: OTP_HASH_SECRET
+        generateValue: true
+      - key: FILE_URL_SECRET
+        generateValue: true
+      - key: DATA_ENCRYPTION_KEY
+        generateValue: true
+      - key: STORAGE_PROVIDER
+        value: local
+      - key: STORAGE_DIR
+        value: /var/data/storage
+      # The admin portal's address (bare hostname is fine; https:// is added).
+      - key: CORS_ORIGINS
+        fromService:
+          type: web
+          name: primecabs-admin
+          property: host
+      - key: SMS_PROVIDER
+        value: fake
+      - key: PAYMENT_PROVIDER
+        value: fake
+      - key: ADMIN_EMAIL
+        sync: false
+      - key: ADMIN_PASSWORD
+        sync: false
+      # true = also create the demo drivers, ride, customer and staff accounts
+      - key: SEED_DEMO
+        value: "true"
+      # Filled in later, when the accounts exist:
+      - key: RAZORPAY_KEY_ID
+        sync: false
+      - key: RAZORPAY_KEY_SECRET
+        sync: false
+      - key: RAZORPAY_WEBHOOK_SECRET
+        sync: false
+      - key: MSG91_AUTH_KEY
+        sync: false
+      - key: MSG91_TEMPLATE_ID
+        sync: false
+
+  - type: web
+    name: primecabs-admin
+    runtime: static
+    branch: main
+    autoDeploy: true
+    buildCommand: npm ci --workspace=@primecabs/admin --include-workspace-root --include=dev && npm -w @primecabs/admin run build
+    staticPublishPath: ./apps/admin/dist
+    pullRequestPreviewsEnabled: false
+    routes:
+      # Single-page app: every path serves index.html
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    headers:
+      - path: /*
+        name: X-Frame-Options
+        value: DENY
+      - path: /*
+        name: X-Robots-Tag
+        value: noindex
+    envVars:
+      - key: NODE_VERSION
+        value: "24"
+      - key: VITE_API_URL
+        fromService:
+          type: web
+          name: primecabs-api
+          property: host
+
+databases:
+  - name: primecabs-db
+    region: singapore
+    plan: basic-256mb
+    databaseName: primecabs
+    user: primecabs
+    postgresMajorVersion: "17"
+    # Reachable only from Render services, not the public internet.
+    ipAllowList: []

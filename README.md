@@ -2,7 +2,7 @@
 
 Scheduled intercity shared cabs for Tier-2/3 India. One backend and database serve three apps: Customer (Android + iPhone), Driver (Android) and the Admin Portal (web).
 
-Requirements: [docs/client_answers.md](docs/client_answers.md). Defaults and open questions: [docs/decisions.md](docs/decisions.md). API reference: [docs/api.md](docs/api.md).
+Requirements: [docs/client_answers.md](docs/client_answers.md). Defaults and open questions: [docs/decisions.md](docs/decisions.md). API reference: [docs/api.md](docs/api.md). Hosting: [docs/deploy.md](docs/deploy.md). Work tracking: [GitHub project board](https://github.com/users/23071183-sys/projects/4).
 
 ## Status
 
@@ -10,8 +10,8 @@ Requirements: [docs/client_answers.md](docs/client_answers.md). Defaults and ope
 |---|---|---|
 | a | Backend, database, seed data, tests (`apps/api`) | Built |
 | b | Admin Portal (`apps/admin`) | Built |
-| c | Driver App (`apps/driver`) | Next |
-| d | Customer App (`apps/customer`) | Later |
+| c | Driver App (`apps/driver`) | Built |
+| d | Customer App (`apps/customer`) | Next |
 
 ## Run it on this Mac
 
@@ -50,6 +50,20 @@ In a third tab, start the Admin Portal on http://localhost:5173 (it reaches the 
 ```bash
 npm run admin:dev
 ```
+
+Start the Driver App. Either preview it in a browser at http://localhost:8081:
+
+```bash
+npm run driver:web
+```
+
+or run it on a phone with Expo Go (same Wi-Fi as this Mac; scan the QR code):
+
+```bash
+npm run driver:start
+```
+
+The app finds the API on this Mac automatically. To use the hosted API instead, see [docs/deploy.md](docs/deploy.md).
 
 Run all tests (the database must be running):
 

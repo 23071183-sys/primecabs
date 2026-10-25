@@ -1,10 +1,10 @@
 // Field encryption (AES-256-GCM) for sensitive values such as bank account numbers,
 // and HMAC signing for short-lived file links.
 import { createCipheriv, createDecipheriv, createHmac, randomBytes } from "node:crypto";
-import { config } from "../config.js";
+import { config, decodeKey } from "../config.js";
 import { safeEqual } from "../domain/otp.js";
 
-const key = () => Buffer.from(config().DATA_ENCRYPTION_KEY, "hex");
+const key = () => decodeKey(config().DATA_ENCRYPTION_KEY)!;
 
 export function encrypt(plain: string): string {
   const iv = randomBytes(12);

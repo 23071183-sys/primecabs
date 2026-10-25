@@ -8,4 +8,4 @@ process.env.DATA_ENCRYPTION_KEY = "0".repeat(64);
 process.env.SMS_PROVIDER = "fake";
 process.env.PAYMENT_PROVIDER = "fake";
 process.env.STORAGE_DIR = "storage-test";
-process.env.CORS_ORIGINS = "";
+process.env.CORS_ORIGINS = "http://localhost:5173";
