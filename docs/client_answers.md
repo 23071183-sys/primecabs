@@ -1,0 +1,127 @@
+# PrimeCabs client answers
+
+Source: the client's filled requirements form, `PrimeCabs_Requirements_Form.pdf`, the copy on the Desktop saved 25 Oct 2026 02:32 (the copy in Downloads is the blank template). Values were read from the PDF form fields with `tools/extract_pdf_answers.js` (195 filled fields, 166 ticked boxes). Question wording comes from the printed form.
+
+Format: question number, question, chosen answers. Typed text is in quotes. Notes in [square brackets] are ours.
+
+- 1.1 Registered company name and name customers will see: PrimeCabs
+- 1.2 Type of business: Private Limited
+- 1.3 Main contact for this project: (no answer)
+- 1.4 Who makes the final decisions: Owner
+- 1.5 How do you take bookings today: Phone calls; WhatsApp
+- 1.6 How many vehicles today: 11 to 50
+- 1.7 Main customers: Students; Families; Office-goers and business travellers; Pilgrims and tourists; Patients and their relatives
+- 2.1 Services at launch: Shared rides (seats in a car); One-way drops (whole car, one direction); Full-car rentals; Round trips; Other: "Carpool and an add on product to shared rides (1. Home pickup / drop 2. Airport )"
+- 2.2 Maximum seats one customer can book on a shared ride: As many as are free
+- 2.3 Who pays for the driver's empty return on a one-way drop: Other: "Not relevant"
+- 2.4 How should rentals be charged: Other: "Driver publishes the ride and mentions the fare. Admin reviews and approves. (In future, will automa" [text cut off in the form]
+- 2.5 If a car is booked in one mode, what happens in the other modes: The car is locked from the other modes for that trip; Other: "In case of shared, a prompt to driver to ask if he wants to host return journey"
+- 2.6 When can customers book: In advance only; In advance and the same day; Instant, within the next hour
+- 2.7 How far ahead can a customer book: Up to 30 days
+- 2.8 Round trips on one booking: Yes, at launch
+- 3.1 Where will you start: Other: "Napur hub to all adjacent spokes."
+- 3.2 Main routes with approximate km: (no answer)
+- 3.3 Typical route length: Other: "Not relevant"
+- 3.4 Pickup in big cities (hubs): Fixed points only (railway station, bus stand, airport); Other: "Fixed points. Some free, some with additional cost."
+- 3.5 Pickup in smaller towns: Both; typed text (Other not ticked): "Refer 2.1"
+- 3.6 How far from the town centre can home pickup be: Up to 10 km
+- 3.7 Departure times: Driver picks the time each day
+- 3.8 Who decides which routes are allowed: Admin only
+- 3.9 How often will you add cities or routes: Every few months
+- 4.1 Who sets the fares: (no box ticked) typed text: "Refer 2.4"
+- 4.2 How is a shared-ride seat priced: Fixed price per seat for each route
+- 4.3 How is a one-way drop priced: Fixed price per route and vehicle type; Per km
+- 4.4 Extra charges: Tolls; Parking; Other: "Different for diff types of ride."
+- 4.5 GST on customer fares: Already included in the price
+- 4.6 How do you earn from each trip: Same commission % from all drivers; Monthly subscription from drivers
+- 4.7 Commission percentage: Under 10%
+- 4.8 Offers at launch: Coupon codes; First-ride discount
+- 4.9 Higher prices on festivals and peak days: Admin can raise prices for chosen dates; Automatic by demand
+- 5.1 Who can become a driver: (no box ticked) typed text: "Anyone. TR license mandatory for yellow number plate cars"
+- 5.2 Documents needed from drivers: Driving licence; Aadhaar; PAN; Selfie photo; Bank or UPI details; Other: "May increase in future. And should be stored for long period of time"
+- 5.3 Documents needed for each vehicle: RC; Insurance; Route permit; Photos of the car
+- 5.4 Who checks the documents: Other: "Admin"
+- 5.5 How fast should a driver be approved: Same day
+- 5.6 Vehicle types accepted: Hatchback; Sedan; SUV; Ertiga or similar 7-seater; Other: "Travellers and Urbania"
+- 5.7 Vehicles and drivers: One driver can have several vehicles; Fleet owners add several vehicles with different drivers; Other: "Unique token will be driver. not the car"
+- 5.8 Who creates the rides: Both
+- 5.9 If a driver cancels or does not show up: Fine
+- 5.10 How does a trip start and end: OTP from the customer; Other: "Start and stop OTP. Unique otp for each passenger in shared riders"
+- 5.11 Live location tracking: Not at launch
+- 5.12 Ratings: Customers rate drivers
+- 6.1 How should customers sign up: Mobile number with OTP; Google login; Other: "Mobile number otp verification mandatory even with google login"
+- 6.2 Details needed from a customer: Name, phone, email and gender; Other: "Age and gender mandatory"
+- 6.3 Details needed for each traveller: Name, phone, age and gender
+- 6.4 How long should seats be held while paying: 5 minutes
+- 6.5 What should the e-ticket show: Booking code; Driver and car details; Fare breakup; Support number; Other: "Ride details ( Time, date )"
+- 6.6 How can customers share the ticket: WhatsApp; PDF download
+- 6.7 Languages in the app: English; Hindi; Marathi
+- 6.8 Booking without installing the app: Website
+- 6.9 Women's safety options: Neither at launch
+- 6.10 Safety tools for travellers: SOS button; Share trip link with family
+- 6.11 Which platforms: Other: "Both android and iphone for customer and minimum android for driver"
+- 7.1 Payment methods: UPI; Debit and credit cards
+- 7.2 Payment gateway: None yet, please recommend one
+- 7.3 When does the customer pay: Advance online, balance to the driver; Other: "full payment for shared rides, advance for rentals and one way trips. Can be paid in cash to driver"
+- 7.4 How should cancellation refunds work: Tiered by time before departure
+- 7.5 If the driver cancels: Full refund
+- 7.6 Who bears gateway charges on refunds: Company
+- 7.7 How often are drivers paid: Daily; Other: "Initially daily or at end of ride"
+- 7.8 How are drivers paid: Bank transfer
+- 7.9 Documents for customers: GST invoice
+- 7.10 Reports for your accountant: Excel
+- 8.1 How many people will use the admin portal: 3 to 5
+- 8.2 Roles needed: Customer support; Accountant; Other: "Location admin and super admin"
+- 8.3 What must admin change without a developer: Cities and routes; Prices; Cancellation rules; Vehicle types; Offers and coupons
+- 8.4 Reports needed: Daily bookings; Revenue; Top routes
+- 8.5 Can admin book on behalf of a customer who phones in: Yes, at launch
+- 8.6 Customer support channels: Phone; Email
+- 8.7 Support hours: 24 hours
+- 8.8 Alerts for the admin team: Driver late or not started; Driver document expiring
+- 9.1 How should customers be notified: App push notification; WhatsApp
+- 9.2 How should drivers be notified: App push notification; SMS; WhatsApp
+- 9.3 Messages customers should get: Booking confirmed; Driver and car details
+- 9.4 WhatsApp Business: We have an account
+- 10.1 Transport licence: We hold the required licence or permit
+- 10.2 Terms, Privacy and Cancellation Policy: We have all three
+- 10.3 GST registration: Registered
+- 10.4 Passenger insurance: No; Other: "not at launch"
+- 10.5 State rules on shared rides and fares: We have checked them
+- 10.6 How long to keep customer and driver data: As the law requires
+- 11.1 Logo: We have a final logo (please attach) [no file received]
+- 11.2 Colours: Use the navy and teal from the prototype
+- 11.3 Tone of wording: Formal
+- 11.4 Photos of cars, drivers and routes: Other: "Each driver uploads photos of their cars"
+- 11.5 Support phone, email and office address: (no answer)
+- 11.6 App name on Play Store and App Store: (no answer)
+- 12.1 Google Play developer account: (no answer)
+- 12.2 Apple developer account: (no answer)
+- 12.3 Domain name and business email: (no answer)
+- 12.4 SMS and OTP provider: (no answer)
+- 12.5 Maps and location: (no answer)
+- 12.6 Existing software to connect with: (no answer)
+- 12.7 Who owns source code and cloud accounts: (no answer)
+- 12.8 Existing data to import: (no answer)
+- 12.9 Where should data be hosted: (no answer)
+- 13.1 Target launch: (no answer)
+- 13.2 How should you launch: (no answer)
+- 13.3 Bookings per day in first 3 months: (no answer)
+- 13.4 Drivers at launch: (no answer)
+- 13.5 Budget for the first version: (no answer)
+- 13.6 Monthly budget for running costs: (no answer)
+- 13.7 Features that matter most for version 1 (top 5): Customer booking and payment; Driver ride publishing; Admin approvals; Refunds and cancellations; Notifications; Ratings; Reports; Driver payouts [8 ticked]
+- 13.8 Who trains drivers and staff: Other ticked, no text
+- 13.9 Support and maintenance after launch: (no answer)
+- 14.1 Customers log in with mobile number and OTP: Correct
+- 14.2 Seats are held for 10 minutes while the customer pays: Change: "5 mins"
+- 14.3 Shared ride up to 6 seats; one-way or rental up to 7 travellers: Change: "Depends on car type"
+- 14.4 A car booked in one mode is locked from the others for that trip: Correct
+- 14.5 GST of 5% is added to the customer's fare: Change (no text typed)
+- 14.6 Platform fee 10% yellow-plate, 15% white-plate, taken before GST: Correct
+- 14.7 Refund: 100% over 24 h, 75% 12-24 h, 50% 4-12 h, 0% under 4 h: Correct
+- 14.8 New drivers must be approved by admin before publishing: Correct
+- 14.9 Drivers publish their own shared rides, PrimeCabs sets the fares: Change: "Answered eariler"
+- 14.10 Home pickup only in smaller towns; hubs use fixed points: Correct
+- 15.1 Biggest worry: Timeline
+- 15.2 Best time for a follow-up call: (no answer)
+- 15.3 Anything else: (no answer)

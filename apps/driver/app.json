@@ -1,0 +1,38 @@
+{
+  "expo": {
+    "name": "PrimeCabs Driver",
+    "slug": "primecabs-driver",
+    "scheme": "primecabs-driver",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "automatic",
+    "backgroundColor": "#F4F6FA",
+    "android": {
+      "package": "in.primecabs.driver",
+      "softwareKeyboardLayoutMode": "pan"
+    },
+    "ios": {
+      "bundleIdentifier": "in.primecabs.driver",
+      "supportsTablet": false
+    },
+    "web": {
+      "bundler": "metro",
+      "output": "single"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-status-bar",
+      "expo-secure-store",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "PrimeCabs needs your photos to upload your driving licence, RC and car photos.",
+          "cameraPermission": "PrimeCabs uses the camera to photograph your documents and car."
+        }
+      ]
+    ],
+    "experiments": {
+      "typedRoutes": false
+    }
+  }
+}

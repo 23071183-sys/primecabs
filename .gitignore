@@ -1,0 +1,19 @@
+node_modules/
+dist/
+.env
+.env.*
+!.env.example
+*.log
+.DS_Store
+# local database and uploaded files
+apps/api/.pgdata/
+apps/api/storage/
+coverage/
+.expo/
+apps/api/storage-test/
+# local tooling and build output
+.claude/
+*.tsbuildinfo
+web-build/
+expo-env.d.ts
+.metro-health-check*

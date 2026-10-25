@@ -1,0 +1,37 @@
+{
+  "name": "primecabs",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "db:start": "npm -w @primecabs/api run db:start",
+    "db:migrate": "npm -w @primecabs/api run db:migrate",
+    "db:seed": "npm -w @primecabs/api run db:seed",
+    "api:dev": "npm -w @primecabs/api run dev",
+    "test": "npm -w @primecabs/api test && npm -w @primecabs/admin test",
+    "typecheck": "npm -w @primecabs/api run typecheck && npm -w @primecabs/admin run typecheck",
+    "admin:dev": "npm -w @primecabs/admin run dev",
+    "admin:build": "npm -w @primecabs/admin run build",
+    "postinstall": "npm -w @primecabs/api exec prisma generate",
+    "driver:start": "npm -w @primecabs/driver run start",
+    "driver:web": "npm -w @primecabs/driver run web"
+  },
+  "allowScripts": {
+    "@prisma/engines@6.19.3": true,
+    "@embedded-postgres/darwin-arm64@17.10.0-beta.17": true,
+    "@prisma/client@6.19.3": true,
+    "prisma@6.19.3": true,
+    "fsevents@2.3.3": true,
+    "esbuild@0.28.2": true,
+    "esbuild@0.25.12": true
+  },
+  "overrides": {
+    "react": "19.3.0",
+    "react-dom": "19.3.0"
+  }
+}

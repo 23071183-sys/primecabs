@@ -1,0 +1,601 @@
+// PrimeCabs Phase 1 database schema.
+// Money is integer paise. Times are UTC (shown in IST by the apps).
+// See docs/decisions.md for the business rules behind these tables.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  CUSTOMER
+  DRIVER
+}
+
+enum UserStatus {
+  ACTIVE
+  BLOCKED
+}
+
+enum Gender {
+  MALE
+  FEMALE
+  OTHER
+}
+
+enum AdminRole {
+  SUPER_ADMIN
+  LOCATION_ADMIN
+  SUPPORT
+  ACCOUNTANT
+}
+
+enum DriverStatus {
+  DRAFT
+  PENDING
+  APPROVED
+  REJECTED
+  SUSPENDED
+}
+
+enum ReviewStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum PlateType {
+  YELLOW
+  WHITE
+}
+
+enum DocOwner {
+  DRIVER
+  VEHICLE
+}
+
+enum CityType {
+  HUB
+  SPOKE
+}
+
+enum PickupKind {
+  RAILWAY
+  BUS_STAND
+  AIRPORT
+  OTHER
+}
+
+enum RideStatus {
+  PENDING_APPROVAL
+  REJECTED
+  OPEN
+  FULL
+  STARTED
+  COMPLETED
+  CANCELLED
+}
+
+enum FareDecision {
+  PENDING
+  APPROVED
+  CHANGED
+  REJECTED
+}
+
+enum BookingStatus {
+  HELD
+  CONFIRMED
+  COMPLETED
+  CANCELLED
+  EXPIRED
+}
+
+enum ActorType {
+  CUSTOMER
+  DRIVER
+  ADMIN
+  SYSTEM
+}
+
+enum PassengerStatus {
+  BOOKED
+  ONBOARD
+  DROPPED
+  NO_SHOW
+}
+
+enum HoldStatus {
+  ACTIVE
+  CONVERTED
+  RELEASED
+}
+
+enum PaymentProvider {
+  RAZORPAY
+  FAKE
+}
+
+enum PaymentStatus {
+  CREATED
+  PAID
+  FAILED
+}
+
+enum RefundStatus {
+  PENDING
+  PROCESSED
+  FAILED
+}
+
+enum OtpPurpose {
+  START
+  END
+}
+
+model User {
+  id        String     @id @default(uuid())
+  phone     String     @unique // +91XXXXXXXXXX
+  role      UserRole
+  status    UserStatus @default(ACTIVE)
+  name      String?
+  email     String?
+  age       Int?
+  gender    Gender?
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+  driver   Driver?
+  bookings Booking[]
+
+  @@map("users")
+}
+
+model AdminUser {
+  id           String    @id @default(uuid())
+  email        String    @unique
+  passwordHash String
+  name         String
+  role         AdminRole
+  active       Boolean   @default(true)
+  failedLogins Int       @default(0)
+  lockedUntil  DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  cityScopes AdminCityScope[]
+
+  @@map("admin_users")
+}
+
+model AdminCityScope {
+  adminUserId String
+  cityId      String
+  adminUser   AdminUser @relation(fields: [adminUserId], references: [id], onDelete: Cascade)
+  city        City      @relation(fields: [cityId], references: [id])
+
+  @@id([adminUserId, cityId])
+  @@map("admin_city_scopes")
+}
+
+model LoginOtp {
+  id         String    @id @default(uuid())
+  phone      String
+  codeHash   String
+  expiresAt  DateTime
+  attempts   Int       @default(0)
+  consumedAt DateTime?
+  ip         String?
+  createdAt  DateTime  @default(now())
+
+  @@index([phone, createdAt])
+  @@map("login_otps")
+}
+
+model Driver {
+  id                 String       @id @default(uuid())
+  userId             String       @unique
+  user               User         @relation(fields: [userId], references: [id])
+  status             DriverStatus @default(DRAFT)
+  homeCityId         String?
+  homeCity           City?        @relation(fields: [homeCityId], references: [id])
+  bankAccountName    String?
+  bankAccountNoEnc   String? // AES-256-GCM, see src/services/crypto.ts
+  bankAccountNoLast4 String?
+  bankIfsc           String?
+  upiId              String?
+  rejectionReason    String?
+  approvedById       String?
+  approvedAt         DateTime?
+  submittedAt        DateTime?
+  createdAt          DateTime     @default(now())
+  updatedAt          DateTime     @updatedAt
+
+  vehicles  Vehicle[]
+  documents Document[]
+  rides     Ride[]
+
+  @@map("drivers")
+}
+
+model VehicleType {
+  id             String  @id @default(uuid())
+  code           String  @unique
+  name           String
+  passengerSeats Int
+  active         Boolean @default(true)
+  sortOrder      Int     @default(0)
+
+  vehicles   Vehicle[]
+  routeFares RouteFare[]
+
+  @@map("vehicle_types")
+}
+
+model Vehicle {
+  id              String       @id @default(uuid())
+  driverId        String
+  driver          Driver       @relation(fields: [driverId], references: [id])
+  vehicleTypeId   String
+  vehicleType     VehicleType  @relation(fields: [vehicleTypeId], references: [id])
+  registrationNo  String       @unique // e.g. MH31AB1234
+  make            String
+  model           String
+  year            Int
+  colour          String
+  plateType       PlateType
+  status          ReviewStatus @default(PENDING)
+  rejectionReason String?
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+
+  documents Document[]
+  rides     Ride[]
+
+  @@map("vehicles")
+}
+
+model DocumentType {
+  id              String     @id @default(uuid())
+  code            String     @unique
+  label           String
+  appliesTo       DocOwner
+  required        Boolean    @default(true)
+  requiredIfPlate PlateType? // e.g. TR licence only when a vehicle has a yellow plate
+  hasExpiry       Boolean    @default(false)
+  active          Boolean    @default(true)
+  sortOrder       Int        @default(0)
+
+  documents Document[]
+
+  @@map("document_types")
+}
+
+model Document {
+  id             String       @id @default(uuid())
+  ownerType      DocOwner
+  driverId       String
+  driver         Driver       @relation(fields: [driverId], references: [id])
+  vehicleId      String?
+  vehicle        Vehicle?     @relation(fields: [vehicleId], references: [id])
+  documentTypeId String
+  documentType   DocumentType @relation(fields: [documentTypeId], references: [id])
+  fileKey        String
+  mimeType       String
+  sizeBytes      Int
+  expiryDate     DateTime?
+  status         ReviewStatus @default(PENDING)
+  reviewedById   String?
+  reviewedAt     DateTime?
+  rejectReason   String?
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  @@index([driverId])
+  @@index([vehicleId])
+  @@map("documents")
+}
+
+model City {
+  id                 String   @id @default(uuid())
+  name               String
+  state              String
+  type               CityType
+  hubCityId          String?
+  hubCity            City?    @relation("HubSpokes", fields: [hubCityId], references: [id])
+  spokes             City[]   @relation("HubSpokes")
+  homePickupAllowed  Boolean  @default(false)
+  homePickupFee      Int      @default(0) // paise
+  homePickupRadiusKm Int      @default(10)
+  active             Boolean  @default(true)
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  pickupPoints PickupPoint[]
+  routesFrom   Route[]          @relation("RouteFrom")
+  routesTo     Route[]          @relation("RouteTo")
+  drivers      Driver[]
+  adminScopes  AdminCityScope[]
+
+  @@unique([name, state])
+  @@map("cities")
+}
+
+model PickupPoint {
+  id        String     @id @default(uuid())
+  cityId    String
+  city      City       @relation(fields: [cityId], references: [id])
+  name      String
+  kind      PickupKind
+  extraFare Int        @default(0) // paise
+  active    Boolean    @default(true)
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+  @@unique([cityId, name])
+  @@map("pickup_points")
+}
+
+model Route {
+  id              String   @id @default(uuid())
+  fromCityId      String
+  fromCity        City     @relation("RouteFrom", fields: [fromCityId], references: [id])
+  toCityId        String
+  toCity          City     @relation("RouteTo", fields: [toCityId], references: [id])
+  distanceKm      Int
+  durationMinutes Int
+  active          Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  fares RouteFare[]
+  rides Ride[]
+
+  @@unique([fromCityId, toCityId])
+  @@map("routes")
+}
+
+model RouteFare {
+  id                String      @id @default(uuid())
+  routeId           String
+  route             Route       @relation(fields: [routeId], references: [id])
+  vehicleTypeId     String
+  vehicleType       VehicleType @relation(fields: [vehicleTypeId], references: [id])
+  referenceSeatFare Int // paise; shown to admin when reviewing a driver's fare
+
+  @@unique([routeId, vehicleTypeId])
+  @@map("route_fares")
+}
+
+model Ride {
+  id               String     @id @default(uuid())
+  driverId         String
+  driver           Driver     @relation(fields: [driverId], references: [id])
+  vehicleId        String
+  vehicle          Vehicle    @relation(fields: [vehicleId], references: [id])
+  routeId          String
+  route            Route      @relation(fields: [routeId], references: [id])
+  departureAt      DateTime
+  arrivalAt        DateTime
+  totalSeats       Int
+  availableSeats   Int // CHECK 0 <= availableSeats <= totalSeats (see migration)
+  proposedSeatFare Int // paise
+  seatFare         Int? // paise; set when admin approves
+  status           RideStatus @default(PENDING_APPROVAL)
+  notes            String?
+  cancelReason     String?
+  cancelledAt      DateTime?
+  startedAt        DateTime?
+  completedAt      DateTime?
+  createdAt        DateTime   @default(now())
+  updatedAt        DateTime   @updatedAt
+
+  fareApprovals FareApproval[]
+  bookings      Booking[]
+  seatHolds     SeatHold[]
+  tripOtps      TripOtp[]
+
+  @@index([routeId, departureAt, status])
+  @@index([driverId, departureAt])
+  @@map("rides")
+}
+
+model FareApproval {
+  id           String       @id @default(uuid())
+  rideId       String
+  ride         Ride         @relation(fields: [rideId], references: [id])
+  proposedFare Int
+  decision     FareDecision @default(PENDING)
+  approvedFare Int?
+  decidedById  String?
+  decidedAt    DateTime?
+  reason       String?
+  createdAt    DateTime     @default(now())
+
+  @@index([rideId])
+  @@map("fare_approvals")
+}
+
+model BookingCounter {
+  day     String @id // YYMMDD in IST
+  lastSeq Int
+
+  @@map("booking_counters")
+}
+
+model Booking {
+  id            String        @id @default(uuid())
+  code          String        @unique // PC-YYMMDD-NNNN
+  customerId    String
+  customer      User          @relation(fields: [customerId], references: [id])
+  rideId        String
+  ride          Ride          @relation(fields: [rideId], references: [id])
+  seats         Int
+  pickupPointId String?
+  pickupAddress String?
+  dropPointId   String?
+  dropAddress   String?
+  status        BookingStatus @default(HELD)
+  holdExpiresAt DateTime
+
+  // Price snapshot taken when the booking is created
+  seatFare         Int
+  seatsAmount      Int
+  pickupExtra      Int
+  dropExtra        Int
+  total            Int
+  gstMode          String
+  gstRateBp        Int // basis points: 500 = 5%
+  gstAmount        Int
+  netAmount        Int // total minus GST
+  commissionModel  String
+  commissionRateBp Int
+  commissionAmount Int
+  driverEarning    Int
+
+  confirmedAt  DateTime?
+  cancelledAt  DateTime?
+  cancelledBy  ActorType?
+  cancelReason String?
+  completedAt  DateTime?
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  passengers Passenger[]
+  seatHold   SeatHold?
+  payments   Payment[]
+  refunds    Refund[]
+
+  @@index([customerId, status])
+  @@index([rideId, status])
+  @@index([status, holdExpiresAt])
+  @@map("bookings")
+}
+
+model Passenger {
+  id        String          @id @default(uuid())
+  bookingId String
+  booking   Booking         @relation(fields: [bookingId], references: [id])
+  name      String
+  phone     String
+  age       Int
+  gender    Gender
+  status    PassengerStatus @default(BOOKED)
+  boardedAt DateTime?
+  droppedAt DateTime?
+  createdAt DateTime        @default(now())
+  updatedAt DateTime        @updatedAt
+
+  tripOtps TripOtp[]
+
+  @@index([bookingId])
+  @@map("passengers")
+}
+
+model SeatHold {
+  id        String     @id @default(uuid())
+  rideId    String
+  ride      Ride       @relation(fields: [rideId], references: [id])
+  bookingId String     @unique
+  booking   Booking    @relation(fields: [bookingId], references: [id])
+  seats     Int
+  expiresAt DateTime
+  status    HoldStatus @default(ACTIVE)
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+  @@index([status, expiresAt])
+  @@map("seat_holds")
+}
+
+model Payment {
+  id                String          @id @default(uuid())
+  bookingId         String
+  booking           Booking         @relation(fields: [bookingId], references: [id])
+  provider          PaymentProvider
+  providerOrderId   String          @unique
+  providerPaymentId String?         @unique
+  amount            Int
+  status            PaymentStatus   @default(CREATED)
+  paidAt            DateTime?
+  failureReason     String?
+  raw               Json?
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+
+  refunds Refund[]
+
+  @@index([bookingId])
+  @@map("payments")
+}
+
+model Refund {
+  id               String       @id @default(uuid())
+  bookingId        String
+  booking          Booking      @relation(fields: [bookingId], references: [id])
+  paymentId        String
+  payment          Payment      @relation(fields: [paymentId], references: [id])
+  amount           Int
+  percent          Int
+  tierLabel        String
+  reason           String
+  initiatedBy      ActorType
+  initiatedById    String?
+  status           RefundStatus @default(PENDING)
+  providerRefundId String?
+  failureReason    String?
+  attempts         Int          @default(0)
+  createdAt        DateTime     @default(now())
+  updatedAt        DateTime     @updatedAt
+
+  @@index([bookingId])
+  @@index([status])
+  @@map("refunds")
+}
+
+model TripOtp {
+  id          String     @id @default(uuid())
+  rideId      String
+  ride        Ride       @relation(fields: [rideId], references: [id])
+  passengerId String
+  passenger   Passenger  @relation(fields: [passengerId], references: [id])
+  purpose     OtpPurpose
+  code        String // 4 digits; shown only to the booking's owner
+  attempts    Int        @default(0)
+  usedAt      DateTime?
+  createdAt   DateTime   @default(now())
+
+  @@unique([passengerId, purpose])
+  @@unique([rideId, code])
+  @@map("trip_otps")
+}
+
+model Setting {
+  key         String   @id
+  value       Json
+  updatedById String?
+  updatedAt   DateTime @updatedAt
+
+  @@map("settings")
+}
+
+model AuditLog {
+  id        String    @id @default(uuid())
+  actorType ActorType
+  actorId   String?
+  action    String
+  entity    String
+  entityId  String?
+  before    Json?
+  after     Json?
+  ip        String?
+  createdAt DateTime  @default(now())
+
+  @@index([entity, entityId])
+  @@index([createdAt])
+  @@map("audit_logs")
+}
