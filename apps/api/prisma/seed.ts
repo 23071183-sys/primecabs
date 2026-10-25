@@ -144,6 +144,12 @@ async function demo(c: Awaited<ReturnType<typeof places>>) {
   const storageDir = resolve(import.meta.dirname, "../storage/demo");
   await mkdir(storageDir, { recursive: true });
   await writeFile(resolve(storageDir, "placeholder.png"), PLACEHOLDER_PNG);
+  // Same file for STORAGE_PROVIDER=database (hosted without a disk).
+  await prisma.storedFile.upsert({
+    where: { key: "demo/placeholder.png" },
+    create: { key: "demo/placeholder.png", mimeType: "image/png", data: new Uint8Array(PLACEHOLDER_PNG) },
+    update: {},
+  });
 
   const ertiga = await prisma.vehicleType.findUniqueOrThrow({ where: { code: "ERTIGA_7S" } });
   const sedan = await prisma.vehicleType.findUniqueOrThrow({ where: { code: "SEDAN" } });

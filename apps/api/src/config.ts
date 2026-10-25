@@ -36,7 +36,7 @@ const schema = z
     RAZORPAY_KEY_ID: z.string().optional(),
     RAZORPAY_KEY_SECRET: z.string().optional(),
     RAZORPAY_WEBHOOK_SECRET: z.string().optional(),
-    STORAGE_PROVIDER: z.enum(["local"]).default("local"),
+    STORAGE_PROVIDER: z.enum(["local", "database"]).default("local"),
     STORAGE_DIR: z.string().default("storage"),
     // Base URL for signed document links. On Render, its own public URL is used when this is unset.
     PUBLIC_BASE_URL: z.string().url().default(process.env.RENDER_EXTERNAL_URL ?? "http://localhost:4000"),

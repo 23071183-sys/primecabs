@@ -1,6 +1,9 @@
 # Render Blueprint for PrimeCabs (https://render.com/docs/blueprint-spec).
-# Creates: the API (Starter, Singapore) with a disk for driver documents, a Postgres database,
-# and the admin portal as a static site. Secrets marked `sync: false` are typed into Render's
+# FREE PLAN: the API (Singapore), a Postgres database and the admin portal as a static site.
+# Free limits: the API sleeps after 15 minutes idle (first request then takes ~1 minute),
+# there is no disk (driver documents are stored in the database), no pre-deploy step
+# (migrations and the seed run when the API starts), and Render deletes a free database
+# 30 days after it is created. See docs/deploy.md for upgrading. Secrets marked `sync: false` are typed into Render's
 # dashboard when the Blueprint is created; they are never stored in git.
 # See docs/deploy.md for the step-by-step guide.
 
@@ -9,19 +12,14 @@ services:
     name: primecabs-api
     runtime: node
     region: singapore
-    plan: starter
+    plan: free
     branch: main
     autoDeploy: true
     # Install only the API workspace (skips the Expo apps), then compile TypeScript.
     buildCommand: npm ci --workspace=@primecabs/api --include-workspace-root --include=dev && npm -w @primecabs/api run build
-    # Runs before each deploy goes live: apply database migrations, then the idempotent seed.
-    preDeployCommand: npm -w @primecabs/api run db:deploy && npm -w @primecabs/api run db:seed
-    startCommand: npm -w @primecabs/api start
+    # Free plan has no pre-deploy step: apply migrations and the idempotent seed, then start.
+    startCommand: npm -w @primecabs/api run db:deploy && npm -w @primecabs/api run db:seed && npm -w @primecabs/api start
     healthCheckPath: /health
-    disk:
-      name: documents
-      mountPath: /var/data
-      sizeGB: 1
     envVars:
       - key: NODE_VERSION
         value: "24"
@@ -41,10 +39,9 @@ services:
         generateValue: true
       - key: DATA_ENCRYPTION_KEY
         generateValue: true
+      # No disk on the free plan, so documents live in the database (stored_files table).
       - key: STORAGE_PROVIDER
-        value: local
-      - key: STORAGE_DIR
-        value: /var/data/storage
+        value: database
       # The admin portal's address (bare hostname is fine; https:// is added).
       - key: CORS_ORIGINS
         fromService:
@@ -106,7 +103,7 @@ services:
 databases:
   - name: primecabs-db
     region: singapore
-    plan: basic-256mb
+    plan: free
     databaseName: primecabs
     user: primecabs
     postgresMajorVersion: "17"

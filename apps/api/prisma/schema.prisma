@@ -599,3 +599,13 @@ model AuditLog {
   @@index([createdAt])
   @@map("audit_logs")
 }
+
+/// Document files when STORAGE_PROVIDER=database (hosts without a persistent disk, e.g. Render free).
+model StoredFile {
+  key       String   @id
+  mimeType  String
+  data      Bytes
+  createdAt DateTime @default(now())
+
+  @@map("stored_files")
+}

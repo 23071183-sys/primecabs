@@ -4,6 +4,7 @@ import { randomUUID } from "node:crypto";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import { config } from "../config.js";
+import { prisma } from "../db.js";
 import { sign, verifySignature } from "../services/crypto.js";
 
 export const ALLOWED_MIME: Record<string, string> = {
@@ -28,15 +29,30 @@ export function sniffMime(buf: Buffer): string | null {
   return null;
 }
 
+// "local" keeps files on disk (development, or a host with a persistent disk).
+// "database" keeps them in the stored_files table (hosts without a disk, such as Render free).
+const inDatabase = () => config().STORAGE_PROVIDER === "database";
+
 export async function saveFile(folder: string, mime: string, data: Buffer): Promise<string> {
   const key = `${folder}/${randomUUID()}.${ALLOWED_MIME[mime]}`;
+  if (inDatabase()) {
+    await prisma.storedFile.create({ data: { key, mimeType: mime, data: new Uint8Array(data) } });
+    return key;
+  }
   const p = pathFor(key);
   await mkdir(dirname(p), { recursive: true });
   await writeFile(p, data, { mode: 0o600 });
   return key;
 }
 
-export const readStoredFile = (key: string) => readFile(pathFor(key));
+export async function readStoredFile(key: string): Promise<Buffer> {
+  if (inDatabase()) {
+    const f = await prisma.storedFile.findUnique({ where: { key } });
+    if (!f) throw new Error("File not found");
+    return Buffer.from(f.data);
+  }
+  return readFile(pathFor(key));
+}
 
 export function signedFileUrl(key: string, ttlSeconds = 300): string {
   const exp = Math.floor(Date.now() / 1000) + ttlSeconds;
