@@ -53,20 +53,20 @@ export function LoginPage() {
         <form onSubmit={submit} className="w-full max-w-sm space-y-5" noValidate>
           <div>
             <div className="mb-6 flex items-center gap-2 lg:hidden">
-              <Building2 className="size-5 text-navy-700" />
-              <span className="font-semibold text-navy-700">PrimeCabs</span>
+              <Building2 className="size-5 text-brand-ink" />
+              <span className="font-semibold text-brand-ink">PrimeCabs</span>
             </div>
-            <h1 className="text-2xl font-semibold tracking-tight text-slate-900">Sign in</h1>
-            <p className="mt-1 text-sm text-slate-500">Use your PrimeCabs staff account.</p>
+            <h1 className="text-2xl font-semibold tracking-tight text-ink">Sign in</h1>
+            <p className="mt-1 text-sm text-ink-2">Use your PrimeCabs staff account.</p>
           </div>
 
-          {signedOutReason && !error && <p className="rounded-xl bg-amber-50 px-3.5 py-2.5 text-sm text-amber-800">{signedOutReason}</p>}
+          {signedOutReason && !error && <p className="rounded-xl bg-warning-bg px-3.5 py-2.5 text-sm text-warning">{signedOutReason}</p>}
 
           <TextInput label="Email" type="email" autoComplete="username" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="name@primecabs.in" autoFocus />
           <TextInput label="Password" type="password" autoComplete="current-password" value={password} onChange={(e) => setPassword(e.target.value)} />
 
           {error && (
-            <p className="rounded-xl bg-red-50 px-3.5 py-2.5 text-sm text-red-700" role="alert">
+            <p className="rounded-xl bg-danger-bg px-3.5 py-2.5 text-sm text-danger" role="alert">
               {error}
             </p>
           )}

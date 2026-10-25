@@ -40,7 +40,7 @@ export function RidesPage() {
     <>
       <PageHeader title="Ride approvals" description="Drivers propose the fare per seat. A ride only appears to customers after you approve its fare." />
       <Card padded={false}>
-        <div className="border-b border-slate-100 p-4">
+        <div className="border-b border-line p-4">
           <Tabs<Filter>
             value={status}
             onChange={(s) => {
@@ -87,25 +87,25 @@ export function RidesPage() {
                   return (
                     <RowButton key={r.id} onClick={() => setSelected(r)} selected={selected?.id === r.id}>
                       <Td className="whitespace-nowrap">
-                        <div className="font-medium text-slate-900">{r.driver.name}</div>
-                        <div className="text-xs text-slate-500">
+                        <div className="font-medium text-ink">{r.driver.name}</div>
+                        <div className="text-xs text-ink-2">
                           {r.from} → {r.to}
                         </div>
                       </Td>
                       <Td className="whitespace-nowrap">
-                        <div className="tabular text-slate-900">{fmtDateTime(r.departureAt)}</div>
-                        <div className="text-xs text-slate-500">{fromNow(r.departureAt)}</div>
+                        <div className="tabular text-ink">{fmtDateTime(r.departureAt)}</div>
+                        <div className="text-xs text-ink-2">{fromNow(r.departureAt)}</div>
                       </Td>
-                      <Td className="text-slate-600">
+                      <Td className="text-ink-2">
                         {r.vehicle.type}
-                        <div className="text-xs tabular text-slate-500">{r.vehicle.registrationNo}</div>
+                        <div className="text-xs tabular text-ink-2">{r.vehicle.registrationNo}</div>
                       </Td>
-                      <Td className="text-right tabular text-slate-600">
+                      <Td className="text-right tabular text-ink-2">
                         {r.status === "PENDING_APPROVAL" ? r.totalSeats : `${r.totalSeats - r.availableSeats}/${r.totalSeats}`}
                       </Td>
                       <Td className="text-right">
-                        <div className="font-medium tabular text-slate-900">{inrFromPaise(r.seatFare ?? r.proposedSeatFare)}</div>
-                        {diff && status === "PENDING_APPROVAL" && <div className={`text-xs ${diff.tone === "amber" ? "text-amber-700" : "text-emerald-700"}`}>{diff.label}</div>}
+                        <div className="font-medium tabular text-ink">{inrFromPaise(r.seatFare ?? r.proposedSeatFare)}</div>
+                        {diff && status === "PENDING_APPROVAL" && <div className={`text-xs ${diff.tone === "amber" ? "text-warning" : "text-success"}`}>{diff.label}</div>}
                       </Td>
                       <Td>
                         <StatusBadge status={r.status} />
@@ -153,7 +153,7 @@ function RideDrawer({ ride, onClose }: { ride: RideRow | null; onClose: () => vo
         onClose={onClose}
         title={
           <span className="flex items-center gap-2">
-            {ride.from} <ArrowRight className="size-4 text-slate-400" /> {ride.to}
+            {ride.from} <ArrowRight className="size-4 text-ink-3" /> {ride.to}
           </span>
         }
         subtitle={`${fmtDateTime(ride.departureAt)} to ${fmtTime(ride.arrivalAt)}`}
@@ -195,16 +195,16 @@ function RideDrawer({ ride, onClose }: { ride: RideRow | null; onClose: () => vo
         </div>
 
         <SectionLabel>Fare</SectionLabel>
-        <div className="rounded-xl bg-slate-50 p-4">
+        <div className="rounded-xl bg-muted p-4">
           <div className="flex items-end justify-between">
             <div>
-              <div className="text-xs text-slate-500">{pending ? "Proposed by driver" : "Approved fare"}</div>
-              <div className="text-2xl font-semibold tabular text-slate-900">{inrFromPaise(ride.seatFare ?? ride.proposedSeatFare)}</div>
-              <div className="text-xs text-slate-500">per seat, GST included</div>
+              <div className="text-xs text-ink-2">{pending ? "Proposed by driver" : "Approved fare"}</div>
+              <div className="text-2xl font-semibold tabular text-ink">{inrFromPaise(ride.seatFare ?? ride.proposedSeatFare)}</div>
+              <div className="text-xs text-ink-2">per seat, GST included</div>
             </div>
             <div className="text-right">
-              <div className="text-xs text-slate-500">Route reference</div>
-              <div className="text-base font-medium tabular text-slate-700">{inrFromPaise(ride.referenceSeatFare)}</div>
+              <div className="text-xs text-ink-2">Route reference</div>
+              <div className="text-base font-medium tabular text-ink-2">{inrFromPaise(ride.referenceSeatFare)}</div>
             </div>
           </div>
           {diff && pending && (
@@ -213,14 +213,14 @@ function RideDrawer({ ride, onClose }: { ride: RideRow | null; onClose: () => vo
             </div>
           )}
           {!pending && ride.seatFare !== ride.proposedSeatFare && (
-            <p className="mt-3 text-xs text-slate-500">The driver proposed {inrFromPaise(ride.proposedSeatFare)}.</p>
+            <p className="mt-3 text-xs text-ink-2">The driver proposed {inrFromPaise(ride.proposedSeatFare)}.</p>
           )}
         </div>
 
         <SectionLabel>Ride</SectionLabel>
         <DetailList
           items={[
-            ["Driver", <span key="d">{ride.driver.name} <span className="font-normal text-slate-500 tabular">{fmtPhone(ride.driver.phone)}</span></span>],
+            ["Driver", <span key="d">{ride.driver.name} <span className="font-normal text-ink-2 tabular">{fmtPhone(ride.driver.phone)}</span></span>],
             ["Vehicle", `${ride.vehicle.type} · ${ride.vehicle.registrationNo}`],
             ["Plate", ride.vehicle.plateType === "YELLOW" ? "Yellow (commercial)" : "White (private)"],
             ["Seats", pending ? `${ride.totalSeats} offered` : `${ride.totalSeats - ride.availableSeats} sold of ${ride.totalSeats}`],

@@ -33,18 +33,18 @@ export function Drawer({ open, onClose, title, subtitle, children, footer, width
   return createPortal(
     <div className="fixed inset-0 z-40 flex justify-end" role="dialog" aria-modal="true">
       <div className="absolute inset-0 bg-slate-900/30" onClick={onClose} aria-hidden />
-      <aside className={`relative flex h-full w-full ${width} flex-col bg-white shadow-2xl`}>
-        <header className="flex items-start justify-between gap-4 border-b border-slate-200 px-6 py-4">
+      <aside className={`relative flex h-full w-full ${width} flex-col bg-card shadow-2xl`}>
+        <header className="flex items-start justify-between gap-4 border-b border-line px-6 py-4">
           <div className="min-w-0">
-            <h2 className="truncate text-base font-semibold text-slate-900">{title}</h2>
-            {subtitle && <div className="mt-0.5 text-sm text-slate-500">{subtitle}</div>}
+            <h2 className="truncate text-base font-semibold text-ink">{title}</h2>
+            {subtitle && <div className="mt-0.5 text-sm text-ink-2">{subtitle}</div>}
           </div>
-          <button onClick={onClose} aria-label="Close" className="-mr-2 rounded-lg p-2 text-slate-500 hover:bg-slate-100 hover:text-slate-900">
+          <button onClick={onClose} aria-label="Close" className="-mr-2 rounded-lg p-2 text-ink-2 hover:bg-muted hover:text-ink">
             <X className="size-5" />
           </button>
         </header>
         <div className="flex-1 overflow-y-auto px-6 py-5">{children}</div>
-        {footer && <footer className="border-t border-slate-200 bg-slate-50/60 px-6 py-4">{footer}</footer>}
+        {footer && <footer className="border-t border-line bg-muted/60 px-6 py-4">{footer}</footer>}
       </aside>
     </div>,
     document.body,
@@ -57,12 +57,12 @@ export function Modal({ open, onClose, title, children, footer, wide }: { open: 
   return createPortal(
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-label={title}>
       <div className="absolute inset-0 bg-slate-900/40" onClick={onClose} aria-hidden />
-      <div className={`relative max-h-[90vh] w-full overflow-y-auto ${wide ? "max-w-3xl" : "max-w-md"} rounded-2xl bg-white shadow-2xl`}>
+      <div className={`relative max-h-[90vh] w-full overflow-y-auto ${wide ? "max-w-3xl" : "max-w-md"} rounded-2xl bg-card shadow-2xl`}>
         <div className="px-6 pt-5 pb-4">
-          <h2 className="text-base font-semibold text-slate-900">{title}</h2>
-          <div className="mt-3 text-sm text-slate-600">{children}</div>
+          <h2 className="text-base font-semibold text-ink">{title}</h2>
+          <div className="mt-3 text-sm text-ink-2">{children}</div>
         </div>
-        {footer && <div className="flex justify-end gap-2 rounded-b-2xl border-t border-slate-100 bg-slate-50 px-6 py-3">{footer}</div>}
+        {footer && <div className="flex justify-end gap-2 rounded-b-2xl border-t border-line bg-muted px-6 py-3">{footer}</div>}
       </div>
     </div>,
     document.body,
@@ -150,7 +150,7 @@ export function ConfirmDialog({ open, onClose, onConfirm, title, body, confirmLa
           />
         )}
         {error && (
-          <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700" role="alert">
+          <p className="rounded-lg bg-danger-bg px-3 py-2 text-sm text-danger" role="alert">
             {error}
           </p>
         )}

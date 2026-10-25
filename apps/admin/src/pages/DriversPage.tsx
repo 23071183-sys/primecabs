@@ -59,7 +59,7 @@ export function DriversPage() {
     <>
       <PageHeader title="Drivers" description="Check documents and approve drivers before they can publish rides. Aim to review the same day." />
       <Card padded={false}>
-        <div className="flex flex-col gap-3 border-b border-slate-100 p-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-col gap-3 border-b border-line p-4 sm:flex-row sm:items-center sm:justify-between">
           <Tabs<Filter>
             value={status}
             onChange={setStatus}
@@ -101,16 +101,16 @@ export function DriversPage() {
                   <RowButton key={d.id} onClick={() => open(d.id)} selected={selected === d.id}>
                     <Td>
                       <div className="flex items-center gap-3">
-                        <div className="flex size-8 items-center justify-center rounded-full bg-navy-50 text-xs font-semibold text-navy-700">{initials(d.name)}</div>
+                        <div className="flex size-8 items-center justify-center rounded-full bg-info-bg text-xs font-semibold text-brand-ink">{initials(d.name)}</div>
                         <div>
-                          <div className="font-medium text-slate-900">{d.name ?? "No name yet"}</div>
-                          <div className="text-xs text-slate-500 tabular">{fmtPhone(d.phone)}</div>
+                          <div className="font-medium text-ink">{d.name ?? "No name yet"}</div>
+                          <div className="text-xs text-ink-2 tabular">{fmtPhone(d.phone)}</div>
                         </div>
                       </div>
                     </Td>
-                    <Td className="text-slate-600">{d.vehicles.length ? d.vehicles.join(", ") : <span className="text-slate-400">None yet</span>}</Td>
-                    <Td className="text-slate-600">{d.homeCity ?? "—"}</Td>
-                    <Td className="text-slate-600">{d.submittedAt ? fromNow(d.submittedAt) : "—"}</Td>
+                    <Td className="text-ink-2">{d.vehicles.length ? d.vehicles.join(", ") : <span className="text-ink-3">None yet</span>}</Td>
+                    <Td className="text-ink-2">{d.homeCity ?? "—"}</Td>
+                    <Td className="text-ink-2">{d.submittedAt ? fromNow(d.submittedAt) : "—"}</Td>
                     <Td>
                       <StatusBadge status={d.status} />
                     </Td>
@@ -207,13 +207,13 @@ function DriverDrawer({ id, onClose }: { id: string | null; onClose: () => void 
         ) : d ? (
           <>
             {d.status === "REJECTED" && d.rejectionReason && (
-              <p className="mb-4 rounded-xl bg-red-50 px-3.5 py-2.5 text-sm text-red-800">Rejected: {d.rejectionReason}</p>
+              <p className="mb-4 rounded-xl bg-danger-bg px-3.5 py-2.5 text-sm text-danger">Rejected: {d.rejectionReason}</p>
             )}
             {d.status === "SUSPENDED" && d.rejectionReason && (
-              <p className="mb-4 rounded-xl bg-red-50 px-3.5 py-2.5 text-sm text-red-800">Suspended: {d.rejectionReason}</p>
+              <p className="mb-4 rounded-xl bg-danger-bg px-3.5 py-2.5 text-sm text-danger">Suspended: {d.rejectionReason}</p>
             )}
             {d.status === "PENDING" && d.checklist.missing.length > 0 && (
-              <p className="mb-4 flex gap-2 rounded-xl bg-amber-50 px-3.5 py-2.5 text-sm text-amber-900">
+              <p className="mb-4 flex gap-2 rounded-xl bg-warning-bg px-3.5 py-2.5 text-sm text-warning">
                 <CircleAlert className="mt-0.5 size-4 shrink-0" />
                 Can't approve yet. Missing or rejected: {d.checklist.missing.map((m) => m.label).join(", ")}.
               </p>
@@ -232,19 +232,19 @@ function DriverDrawer({ id, onClose }: { id: string | null; onClose: () => void 
 
             <SectionLabel>Vehicles</SectionLabel>
             <div className="space-y-2">
-              {d.vehicles.length === 0 && <p className="text-sm text-slate-500">No vehicles added.</p>}
+              {d.vehicles.length === 0 && <p className="text-sm text-ink-2">No vehicles added.</p>}
               {d.vehicles.map((v) => (
-                <div key={v.id} className="rounded-xl ring-1 ring-slate-200 p-3.5">
+                <div key={v.id} className="rounded-xl ring-1 ring-line p-3.5">
                   <div className="flex items-start justify-between gap-3">
                     <div>
-                      <div className="flex items-center gap-2 text-sm font-medium text-slate-900">
+                      <div className="flex items-center gap-2 text-sm font-medium text-ink">
                         {v.make} {v.model}
                         <Badge tone={v.plateType === "YELLOW" ? "amber" : "gray"}>{v.plateType === "YELLOW" ? "Yellow plate" : "White plate"}</Badge>
                       </div>
-                      <div className="mt-0.5 text-xs text-slate-500 tabular">
+                      <div className="mt-0.5 text-xs text-ink-2 tabular">
                         {v.registrationNo} · {v.type.name} · {v.type.passengerSeats} seats · {v.year} · {v.colour}
                       </div>
-                      {v.rejectionReason && v.status === "REJECTED" && <div className="mt-1 text-xs text-red-700">{v.rejectionReason}</div>}
+                      {v.rejectionReason && v.status === "REJECTED" && <div className="mt-1 text-xs text-danger">{v.rejectionReason}</div>}
                     </div>
                     <StatusBadge status={v.status} />
                   </div>
@@ -263,17 +263,17 @@ function DriverDrawer({ id, onClose }: { id: string | null; onClose: () => void 
             </div>
 
             <SectionLabel>Documents</SectionLabel>
-            <ul className="divide-y divide-slate-100 rounded-xl ring-1 ring-slate-200">
+            <ul className="divide-y divide-line rounded-xl ring-1 ring-line">
               {d.checklist.items
                 .filter((i) => i.required || i.documentId)
                 .map((item) => {
                   const doc = docFor(item);
                   return (
                     <li key={`${item.documentTypeId}-${item.vehicleId}`} className="flex items-center gap-3 px-3.5 py-2.5">
-                      <FileText className="size-4 shrink-0 text-slate-400" />
+                      <FileText className="size-4 shrink-0 text-ink-3" />
                       <div className="min-w-0 flex-1">
-                        <div className="text-sm text-slate-900">{item.label}</div>
-                        <div className="text-xs text-slate-500">
+                        <div className="text-sm text-ink">{item.label}</div>
+                        <div className="text-xs text-ink-2">
                           {item.vehicleId ? vehicleName(item.vehicleId) : "Driver"}
                           {doc?.expiryDate ? ` · expires ${fmtDate(doc.expiryDate)}` : ""}
                           {!item.required && " · optional"}
@@ -284,7 +284,7 @@ function DriverDrawer({ id, onClose }: { id: string | null; onClose: () => void 
                       ) : (
                         <>
                           {doc.status === "APPROVED" ? (
-                            <CheckCircle2 className="size-4 text-emerald-600" aria-label="Approved" />
+                            <CheckCircle2 className="size-4 text-success" aria-label="Approved" />
                           ) : doc.status === "REJECTED" ? (
                             <Badge tone="red">Rejected</Badge>
                           ) : (
@@ -294,7 +294,7 @@ function DriverDrawer({ id, onClose }: { id: string | null; onClose: () => void 
                             View
                           </Button>
                           {review && doc.status === "PENDING" && (
-                            <Button size="sm" variant="ghost" className="text-red-700" onClick={() => setDialog({ kind: "rejectDoc", id: doc.id, label: item.label })}>
+                            <Button size="sm" variant="ghost" className="text-danger" onClick={() => setDialog({ kind: "rejectDoc", id: doc.id, label: item.label })}>
                               Reject
                             </Button>
                           )}

@@ -4,17 +4,17 @@ import type { BookingStatus, DriverStatus, ReviewStatus, RideStatus } from "@/li
 export type Tone = "green" | "amber" | "red" | "blue" | "gray" | "navy";
 
 const tones: Record<Tone, string> = {
-  green: "bg-emerald-50 text-emerald-700 ring-emerald-600/20",
-  amber: "bg-amber-50 text-amber-800 ring-amber-600/25",
-  red: "bg-red-50 text-red-700 ring-red-600/20",
-  blue: "bg-sky-50 text-sky-700 ring-sky-600/20",
-  gray: "bg-slate-100 text-slate-600 ring-slate-500/20",
-  navy: "bg-navy-50 text-navy-700 ring-navy-600/20",
+  green: "bg-success-bg text-success",
+  amber: "bg-warning-bg text-warning",
+  red: "bg-danger-bg text-danger",
+  blue: "bg-info-bg text-info",
+  gray: "bg-muted text-ink-2",
+  navy: "bg-info-bg text-brand-ink",
 };
 
 export function Badge({ tone = "gray", children, dot }: { tone?: Tone; children: ReactNode; dot?: boolean }) {
   return (
-    <span className={`inline-flex items-center gap-1.5 whitespace-nowrap rounded-full px-2 py-0.5 text-xs font-medium ring-1 ring-inset ${tones[tone]}`}>
+    <span className={`inline-flex items-center gap-1.5 whitespace-nowrap rounded-full px-2.5 py-1 text-xs font-semibold ${tones[tone]}`}>
       {dot && <span className="size-1.5 rounded-full bg-current" aria-hidden />}
       {children}
     </span>

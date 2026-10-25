@@ -26,7 +26,7 @@ export function AuditPage() {
     <>
       <PageHeader title="Audit log" description="Every admin action and every status change, with what changed." />
       <Card padded={false}>
-        <div className="border-b border-slate-100 p-4">
+        <div className="border-b border-line p-4">
           <Tabs value={entity} onChange={(v) => (setEntity(v), setPage(1))} options={ENTITIES.map((e) => ({ value: e, label: e ? e.replace("_", " ").replace(/^\w/, (c) => c.toUpperCase()) : "All" }))} />
         </div>
         {q.isLoading ? (
@@ -53,27 +53,27 @@ export function AuditPage() {
                   const isOpen = open === l.id;
                   return (
                     <Fragment key={l.id}>
-                      <tr className={hasDetail ? "cursor-pointer hover:bg-slate-50" : ""} onClick={() => hasDetail && setOpen(isOpen ? null : l.id)}>
-                        <Td className="text-slate-400">{hasDetail && (isOpen ? <ChevronDown className="size-4" /> : <ChevronRight className="size-4" />)}</Td>
-                        <Td className="whitespace-nowrap tabular text-slate-600">{fmtDateTime(l.createdAt)}</Td>
+                      <tr className={hasDetail ? "cursor-pointer hover:bg-muted" : ""} onClick={() => hasDetail && setOpen(isOpen ? null : l.id)}>
+                        <Td className="text-ink-3">{hasDetail && (isOpen ? <ChevronDown className="size-4" /> : <ChevronRight className="size-4" />)}</Td>
+                        <Td className="whitespace-nowrap tabular text-ink-2">{fmtDateTime(l.createdAt)}</Td>
                         <Td>{actor(l)}</Td>
                         <Td>
                           <Badge tone={l.action.includes("reject") || l.action.includes("cancel") || l.action.includes("fail") || l.action.includes("suspend") ? "red" : l.action.includes("approv") || l.action.includes("confirm") || l.action.includes("processed") ? "green" : "gray"}>
                             {l.action}
                           </Badge>
                         </Td>
-                        <Td className="text-xs tabular text-slate-500">
+                        <Td className="text-xs tabular text-ink-2">
                           {l.entity} {l.entityId && l.entityId.length > 24 ? l.entityId.slice(0, 8) : l.entityId}
                         </Td>
                       </tr>
                       {isOpen && (
                         <tr>
-                          <td colSpan={5} className="bg-slate-50 px-5 py-3">
+                          <td colSpan={5} className="bg-muted px-5 py-3">
                             <div className="grid gap-3 md:grid-cols-2">
                               {(["before", "after"] as const).map((k) => (
                                 <div key={k}>
-                                  <div className="mb-1 text-xs font-medium text-slate-500">{k === "before" ? "Before" : "After"}</div>
-                                  <pre className="max-h-64 overflow-auto rounded-lg bg-white p-3 text-xs text-slate-700 ring-1 ring-slate-200">{l[k] == null ? "—" : JSON.stringify(l[k], null, 2)}</pre>
+                                  <div className="mb-1 text-xs font-medium text-ink-2">{k === "before" ? "Before" : "After"}</div>
+                                  <pre className="max-h-64 overflow-auto rounded-lg bg-card p-3 text-xs text-ink-2 ring-1 ring-line">{l[k] == null ? "—" : JSON.stringify(l[k], null, 2)}</pre>
                                 </div>
                               ))}
                             </div>

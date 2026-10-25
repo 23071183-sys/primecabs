@@ -36,8 +36,8 @@ function Section({ title, description, children, onSave, saving, dirty, editable
     <Card>
       <div className="grid gap-6 lg:grid-cols-[260px_1fr]">
         <div>
-          <h3 className="text-sm font-semibold text-slate-900">{title}</h3>
-          <p className="mt-1 text-sm text-slate-500">{description}</p>
+          <h3 className="text-sm font-semibold text-ink">{title}</h3>
+          <p className="mt-1 text-sm text-ink-2">{description}</p>
         </div>
         <div>
           <fieldset disabled={!editable} className="space-y-4">
@@ -136,7 +136,7 @@ export function SettingsPage() {
               </SelectInput>
               <TextInput label="GST rate" suffix="%" inputMode="decimal" value={String(gst.ratePercent)} onChange={(e) => setGst({ ...gst, ratePercent: num(e.target.value) })} />
             </div>
-            <p className="text-xs text-slate-500">
+            <p className="text-xs text-ink-2">
               Example: a ₹550 seat {gst.mode === "INCLUDED" ? `includes ${inrFromPaise(Math.round((55000 * gst.ratePercent) / (100 + gst.ratePercent)))} GST` : `costs ${inrFromPaise(Math.round(55000 * (1 + gst.ratePercent / 100)))} with GST`}.
             </p>
           </Section>
@@ -219,7 +219,7 @@ export function SettingsPage() {
                 Add tier
               </Button>
             )}
-            {!tiers.some((t) => t.minHoursBefore === 0) && <p className="text-xs text-red-600">Keep a tier starting at 0 hours.</p>}
+            {!tiers.some((t) => t.minHoursBefore === 0) && <p className="text-xs text-danger">Keep a tier starting at 0 hours.</p>}
           </Section>
 
           <Section
@@ -268,7 +268,7 @@ function VehicleTypes({ editable }: { editable: boolean }) {
     <Card padded={false}>
       <div className="px-5 pt-5">
         <CardTitle action={editable && <Button size="sm" icon={<Plus className="size-4" />} onClick={() => setEdit("new")}>Add type</Button>}>Vehicle types</CardTitle>
-        <p className="-mt-2 mb-4 text-sm text-slate-500">Passenger seats exclude the driver. A driver can publish fewer seats but never more.</p>
+        <p className="-mt-2 mb-4 text-sm text-ink-2">Passenger seats exclude the driver. A driver can publish fewer seats but never more.</p>
       </div>
       <Table>
         <thead>
@@ -284,7 +284,7 @@ function VehicleTypes({ editable }: { editable: boolean }) {
           {q.data?.map((t) => (
             <tr key={t.id}>
               <Td className="font-medium">{t.name}</Td>
-              <Td className="text-xs tabular text-slate-500">{t.code}</Td>
+              <Td className="text-xs tabular text-ink-2">{t.code}</Td>
               <Td className="text-right tabular">{t.passengerSeats}</Td>
               <Td>{t.active ? <Badge tone="green">Active</Badge> : <Badge>Hidden</Badge>}</Td>
               <Td className="text-right">
@@ -337,7 +337,7 @@ function VehicleTypeModal({ type, onClose }: { type: VehicleType | null; onClose
         <TextInput label="Name customers see" value={f.name} onChange={(e) => setF({ ...f, name: e.target.value })} />
         <TextInput label="Passenger seats" inputMode="numeric" value={f.passengerSeats} onChange={(e) => setF({ ...f, passengerSeats: e.target.value.replace(/\D/g, "") })} />
         <Toggle label="Active" hint="Hidden types can't be chosen for new vehicles." checked={f.active} onChange={(v) => setF({ ...f, active: v })} />
-        {m.error && <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{errorMessage(m.error)}</p>}
+        {m.error && <p className="rounded-lg bg-danger-bg px-3 py-2 text-sm text-danger">{errorMessage(m.error)}</p>}
       </div>
     </Modal>
   );
@@ -350,7 +350,7 @@ function DocumentTypes({ editable }: { editable: boolean }) {
     <Card padded={false}>
       <div className="px-5 pt-5">
         <CardTitle action={editable && <Button size="sm" icon={<Plus className="size-4" />} onClick={() => setEdit("new")}>Add document</Button>}>Driver and vehicle documents</CardTitle>
-        <p className="-mt-2 mb-4 text-sm text-slate-500">What drivers must upload before they can be approved (5.2, 5.3). Files are kept and never deleted automatically.</p>
+        <p className="-mt-2 mb-4 text-sm text-ink-2">What drivers must upload before they can be approved (5.2, 5.3). Files are kept and never deleted automatically.</p>
       </div>
       <Table>
         <thead>
@@ -366,8 +366,8 @@ function DocumentTypes({ editable }: { editable: boolean }) {
           {q.data?.map((t) => (
             <tr key={t.id}>
               <Td className="font-medium">{t.label}</Td>
-              <Td className="text-slate-600">{t.appliesTo === "DRIVER" ? "Driver" : "Each vehicle"}</Td>
-              <Td className="text-slate-600">
+              <Td className="text-ink-2">{t.appliesTo === "DRIVER" ? "Driver" : "Each vehicle"}</Td>
+              <Td className="text-ink-2">
                 {!t.required ? "Optional" : t.requiredIfPlate ? `Required for ${t.requiredIfPlate.toLowerCase()} plates` : "Required"}
                 {t.hasExpiry && " · has expiry date"}
               </Td>
@@ -446,7 +446,7 @@ function DocumentTypeModal({ type, onClose }: { type: DocumentType | null; onClo
         )}
         <Toggle label="Has an expiry date" hint="Drivers must enter the expiry date when uploading." checked={f.hasExpiry} onChange={(v) => setF({ ...f, hasExpiry: v })} />
         <Toggle label="Active" checked={f.active} onChange={(v) => setF({ ...f, active: v })} />
-        {m.error && <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{errorMessage(m.error)}</p>}
+        {m.error && <p className="rounded-lg bg-danger-bg px-3 py-2 text-sm text-danger">{errorMessage(m.error)}</p>}
       </div>
     </Modal>
   );

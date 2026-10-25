@@ -7,7 +7,7 @@ import {
   LayoutDashboard,
   LogOut,
   MapPin,
-  Menu,
+  MoreHorizontal,
   ReceiptIndianRupee,
   Settings,
   Ticket,
@@ -24,6 +24,8 @@ import type { Overview, Permission } from "@/lib/types";
 interface NavItem {
   to: string;
   label: string;
+  /** Label on the phone tab bar, when the full one is too long */
+  short?: string;
   icon: ReactNode;
   permission?: Permission;
   badge?: (o: Overview) => number;
@@ -35,7 +37,7 @@ const NAV: { heading?: string; items: NavItem[] }[] = [
     heading: "Operations",
     items: [
       { to: "/drivers", label: "Drivers", icon: <IdCard className="size-4" />, permission: "drivers.read", badge: (o) => o.driversPending },
-      { to: "/rides", label: "Ride approvals", icon: <ClipboardCheck className="size-4" />, permission: "rides.read", badge: (o) => o.ridesPending },
+      { to: "/rides", label: "Ride approvals", short: "Rides", icon: <ClipboardCheck className="size-4" />, permission: "rides.read", badge: (o) => o.ridesPending },
       { to: "/bookings", label: "Bookings", icon: <Ticket className="size-4" />, permission: "bookings.read" },
       { to: "/money", label: "Payments and refunds", icon: <ReceiptIndianRupee className="size-4" />, permission: "payments.read", badge: (o) => o.refundsFailed },
     ],
@@ -123,6 +125,48 @@ function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
   );
 }
 
+/** Phone and tablet: the app's bottom tab bar. The first four pages this admin can open, then More for the rest. */
+function BottomTabs({ onMore }: { onMore: () => void }) {
+  const { can } = useAuth();
+  const overview = useQuery({ queryKey: ["overview"], queryFn: () => api<Overview>("/admin/overview"), refetchInterval: 60_000 });
+  const tabs = NAV.flatMap((g) => g.items)
+    .filter((i) => !i.permission || can(i.permission))
+    .slice(0, 4);
+  const tab = "flex flex-1 flex-col items-center gap-1 pt-2 pb-1.5 text-[12px] font-semibold";
+  const pill = "relative flex h-7 w-14 items-center justify-center rounded-full transition-colors";
+
+  return (
+    <nav className="fixed inset-x-0 bottom-0 z-30 flex border-t border-line bg-card pb-[env(safe-area-inset-bottom)] lg:hidden" aria-label="Main">
+      {tabs.map((item) => {
+        const count = overview.data && item.badge ? item.badge(overview.data) : 0;
+        return (
+          <NavLink key={item.to} to={item.to} end={item.to === "/"} className={({ isActive }) => `${tab} ${isActive ? "text-ink" : "text-ink-2"}`}>
+            {({ isActive }) => (
+              <>
+                <span className={`${pill} ${isActive ? "bg-primary-soft text-accent" : ""}`}>
+                  <span className="[&>svg]:size-5">{item.icon}</span>
+                  {count > 0 && (
+                    <span className="absolute -top-1 right-1.5 min-w-4 rounded-full bg-teal-500 px-1 text-center text-[10px] leading-4 font-bold text-teal-900" aria-label={`${count} waiting`}>
+                      {count}
+                    </span>
+                  )}
+                </span>
+                {item.short ?? item.label}
+              </>
+            )}
+          </NavLink>
+        );
+      })}
+      <button onClick={onMore} className={`${tab} text-ink-2`}>
+        <span className={pill}>
+          <MoreHorizontal className="size-5" />
+        </span>
+        More
+      </button>
+    </nav>
+  );
+}
+
 export function Layout() {
   const [open, setOpen] = useState(false);
   const location = useLocation();
@@ -138,23 +182,26 @@ export function Layout() {
           <div className="absolute inset-0 bg-slate-900/40" onClick={() => setOpen(false)} aria-hidden />
           <div className="relative h-full w-64">
             <Sidebar onNavigate={() => setOpen(false)} />
-            <button onClick={() => setOpen(false)} className="absolute top-4 -right-11 rounded-lg bg-white p-2 text-slate-700" aria-label="Close menu">
+            <button onClick={() => setOpen(false)} className="absolute top-4 -right-11 rounded-lg bg-card p-2 text-ink-2" aria-label="Close menu">
               <X className="size-5" />
             </button>
           </div>
         </div>
       )}
 
-      <header className="sticky top-0 z-20 flex h-14 items-center gap-3 border-b border-slate-200 bg-white/90 px-4 backdrop-blur lg:hidden">
-        <button onClick={() => setOpen(true)} className="rounded-lg p-2 text-slate-600 hover:bg-slate-100" aria-label="Open menu">
-          <Menu className="size-5" />
-        </button>
-        <span className="text-sm font-semibold text-navy-700">PrimeCabs admin</span>
+      {/* The app's navy top bar */}
+      <header className="sticky top-0 z-20 flex h-14 items-center gap-2.5 bg-navy-700 px-4 text-white lg:hidden">
+        <div className="flex size-8 items-center justify-center rounded-lg bg-white/10">
+          <Building2 className="size-4 text-teal-400" aria-hidden />
+        </div>
+        <span className="text-[17px] font-semibold">PrimeCabs admin</span>
       </header>
 
-      <main key={location.pathname} className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
+      <main key={location.pathname} className="mx-auto max-w-7xl px-4 pt-6 pb-24 sm:px-6 lg:px-8 lg:py-8">
         <Outlet />
       </main>
+
+      <BottomTabs onMore={() => setOpen(true)} />
     </div>
   );
 }

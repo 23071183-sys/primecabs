@@ -33,9 +33,9 @@ export function DocumentViewer({ docId, title, onClose }: { docId: string | null
         </>
       }
     >
-      <div className="flex min-h-80 items-center justify-center rounded-xl bg-slate-100">
-        {q.isLoading && <Loader2 className="size-6 animate-spin text-slate-400" />}
-        {q.isError && <p className="text-sm text-red-700">{errorMessage(q.error)}</p>}
+      <div className="flex min-h-80 items-center justify-center rounded-xl bg-muted">
+        {q.isLoading && <Loader2 className="size-6 animate-spin text-ink-3" />}
+        {q.isError && <p className="text-sm text-danger">{errorMessage(q.error)}</p>}
         {q.data &&
           (q.data.mimeType === "application/pdf" ? (
             <iframe src={q.data.url} title={title} className="h-[60vh] w-full rounded-xl" />
@@ -43,7 +43,7 @@ export function DocumentViewer({ docId, title, onClose }: { docId: string | null
             <img src={q.data.url} alt={title} className="max-h-[60vh] max-w-full rounded-lg object-contain" />
           ))}
       </div>
-      <p className="mt-3 text-xs text-slate-500">This link expires in 5 minutes. Your view has been recorded in the audit log.</p>
+      <p className="mt-3 text-xs text-ink-2">This link expires in 5 minutes. Your view has been recorded in the audit log.</p>
     </Modal>
   );
 }

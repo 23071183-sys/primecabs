@@ -20,10 +20,10 @@ export function ToastProvider({ children }: { children: ReactNode }) {
   return (
     <Ctx.Provider value={push}>
       {children}
-      <div className="pointer-events-none fixed bottom-4 left-1/2 z-[60] flex -translate-x-1/2 flex-col items-center gap-2" aria-live="polite">
+      <div className="pointer-events-none fixed bottom-20 left-1/2 lg:bottom-4 z-[60] flex -translate-x-1/2 flex-col items-center gap-2" aria-live="polite">
         {toasts.map((t) => (
-          <div key={t.id} className="pointer-events-auto flex items-center gap-2.5 rounded-xl bg-slate-900 px-4 py-2.5 text-sm text-white shadow-lg">
-            {t.tone === "success" ? <CheckCircle2 className="size-4 text-teal-400" /> : <XCircle className="size-4 text-red-400" />}
+          <div key={t.id} className="pointer-events-auto flex items-center gap-2.5 rounded-card bg-[#0f172a] px-4 py-3 text-sm text-white shadow-lg ring-1 ring-white/10">
+            {t.tone === "success" ? <CheckCircle2 className="size-4 text-teal-400" /> : <XCircle className="size-4 text-danger" />}
             {t.message}
           </div>
         ))}

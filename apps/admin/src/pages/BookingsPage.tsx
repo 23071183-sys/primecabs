@@ -37,7 +37,7 @@ export function BookingsPage() {
     <>
       <PageHeader title="Bookings" description="Search by booking code, customer phone or name." />
       <Card padded={false}>
-        <div className="flex flex-col gap-3 border-b border-slate-100 p-4 lg:flex-row lg:items-center lg:justify-between">
+        <div className="flex flex-col gap-3 border-b border-line p-4 lg:flex-row lg:items-center lg:justify-between">
           <Tabs<Filter>
             value={status}
             onChange={(s) => (setStatus(s), setPage(1))}
@@ -75,18 +75,18 @@ export function BookingsPage() {
                 {list.data.items.map((b) => (
                   <RowButton key={b.id} onClick={() => setSelected(b.id)} selected={selected === b.id}>
                     <Td>
-                      <div className="font-medium tabular text-slate-900">{b.code}</div>
-                      <div className="text-xs text-slate-500">Booked {fmtDateTime(b.createdAt)}</div>
+                      <div className="font-medium tabular text-ink">{b.code}</div>
+                      <div className="text-xs text-ink-2">Booked {fmtDateTime(b.createdAt)}</div>
                     </Td>
                     <Td>
-                      <div className="text-slate-900">{b.customer.name ?? "—"}</div>
-                      <div className="text-xs tabular text-slate-500">{fmtPhone(b.customer.phone)}</div>
+                      <div className="text-ink">{b.customer.name ?? "—"}</div>
+                      <div className="text-xs tabular text-ink-2">{fmtPhone(b.customer.phone)}</div>
                     </Td>
                     <Td>
-                      <div className="text-slate-900">
+                      <div className="text-ink">
                         {b.from} → {b.to}
                       </div>
-                      <div className="text-xs tabular text-slate-500">{fmtDateTime(b.departureAt)}</div>
+                      <div className="text-xs tabular text-ink-2">{fmtDateTime(b.departureAt)}</div>
                     </Td>
                     <Td className="text-right tabular">{b.seats}</Td>
                     <Td className="text-right font-medium tabular">{inrFromPaise(b.total)}</Td>
@@ -176,7 +176,7 @@ function BookingDrawer({ id, onClose }: { id: string | null; onClose: () => void
             </div>
 
             {b.cancelReason && (
-              <p className="mt-4 rounded-xl bg-red-50 px-3.5 py-2.5 text-sm text-red-800">
+              <p className="mt-4 rounded-xl bg-danger-bg px-3.5 py-2.5 text-sm text-danger">
                 Cancelled by {b.cancelledBy?.toLowerCase()} on {fmtDateTime(b.cancelledAt)}: {b.cancelReason}
               </p>
             )}
@@ -199,12 +199,12 @@ function BookingDrawer({ id, onClose }: { id: string | null; onClose: () => void
             />
 
             <SectionLabel>Travellers</SectionLabel>
-            <ul className="divide-y divide-slate-100 rounded-xl ring-1 ring-slate-200">
+            <ul className="divide-y divide-line rounded-xl ring-1 ring-line">
               {b.passengers.map((p) => (
                 <li key={p.id} className="flex items-center justify-between gap-3 px-3.5 py-2.5 text-sm">
                   <div>
-                    <div className="text-slate-900">{p.name}</div>
-                    <div className="text-xs text-slate-500">
+                    <div className="text-ink">{p.name}</div>
+                    <div className="text-xs text-ink-2">
                       {titleCase(p.gender)}, {p.age} · <span className="tabular">{fmtPhone(p.phone)}</span>
                     </div>
                   </div>
@@ -228,22 +228,22 @@ function BookingDrawer({ id, onClose }: { id: string | null; onClose: () => void
 
             <SectionLabel>Payments and refunds</SectionLabel>
             <div className="space-y-2">
-              {b.payments.length === 0 && <p className="text-sm text-slate-500">No payment started.</p>}
+              {b.payments.length === 0 && <p className="text-sm text-ink-2">No payment started.</p>}
               {b.payments.map((p) => (
-                <div key={p.id} className="flex items-center justify-between rounded-xl ring-1 ring-slate-200 px-3.5 py-2.5 text-sm">
+                <div key={p.id} className="flex items-center justify-between rounded-xl ring-1 ring-line px-3.5 py-2.5 text-sm">
                   <div>
                     <div className="font-medium tabular">{inrFromPaise(p.amount)}</div>
-                    <div className="text-xs text-slate-500 tabular">{p.providerPaymentId ?? p.providerOrderId}</div>
+                    <div className="text-xs text-ink-2 tabular">{p.providerPaymentId ?? p.providerOrderId}</div>
                   </div>
                   <StatusBadge status={p.status} />
                 </div>
               ))}
               {b.refunds.map((r) => (
-                <div key={r.id} className="flex items-center justify-between rounded-xl bg-slate-50 px-3.5 py-2.5 text-sm">
+                <div key={r.id} className="flex items-center justify-between rounded-xl bg-muted px-3.5 py-2.5 text-sm">
                   <div>
                     <div className="font-medium tabular">Refund {inrFromPaise(r.amount)}</div>
-                    <div className="text-xs text-slate-500">{r.tierLabel}</div>
-                    {r.failureReason && <div className="text-xs text-red-700">{r.failureReason}</div>}
+                    <div className="text-xs text-ink-2">{r.tierLabel}</div>
+                    {r.failureReason && <div className="text-xs text-danger">{r.failureReason}</div>}
                   </div>
                   <StatusBadge status={r.status} />
                 </div>
@@ -251,25 +251,25 @@ function BookingDrawer({ id, onClose }: { id: string | null; onClose: () => void
             </div>
 
             <SectionLabel>Timeline</SectionLabel>
-            <ol className="relative ml-1.5 space-y-3 border-l border-slate-200 pl-4 text-sm">
+            <ol className="relative ml-1.5 space-y-3 border-l border-line pl-4 text-sm">
               <li>
-                <span className="absolute -left-[5px] mt-1.5 size-2.5 rounded-full bg-slate-300" />
-                <div className="text-slate-900">Seats held for payment</div>
-                <div className="text-xs text-slate-500">{fmtDateTime(b.createdAt)}</div>
+                <span className="absolute -left-[5px] mt-1.5 size-2.5 rounded-full bg-line-strong" />
+                <div className="text-ink">Seats held for payment</div>
+                <div className="text-xs text-ink-2">{fmtDateTime(b.createdAt)}</div>
               </li>
               {b.timeline.map((t) => (
                 <li key={t.id}>
-                  <span className={`absolute -left-[5px] mt-1.5 size-2.5 rounded-full ${t.action === "booking.cancelled" ? "bg-red-400" : "bg-teal-500"}`} />
-                  <div className="text-slate-900">{timelineLabel[t.action] ?? t.action}</div>
-                  <div className="text-xs text-slate-500">
+                  <span className={`absolute -left-[5px] mt-1.5 size-2.5 rounded-full ${t.action === "booking.cancelled" ? "bg-danger" : "bg-teal-500"}`} />
+                  <div className="text-ink">{timelineLabel[t.action] ?? t.action}</div>
+                  <div className="text-xs text-ink-2">
                     {fmtDateTime(t.createdAt)} · {t.actorType.toLowerCase()}
                   </div>
                 </li>
               ))}
               {b.status === "EXPIRED" && (
                 <li>
-                  <span className="absolute -left-[5px] mt-1.5 size-2.5 rounded-full bg-slate-300" />
-                  <div className="text-slate-900">Hold expired before payment</div>
+                  <span className="absolute -left-[5px] mt-1.5 size-2.5 rounded-full bg-line-strong" />
+                  <div className="text-ink">Hold expired before payment</div>
                 </li>
               )}
             </ol>

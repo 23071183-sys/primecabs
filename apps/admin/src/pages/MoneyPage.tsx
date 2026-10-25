@@ -55,7 +55,7 @@ function Refunds() {
 
   return (
     <Card padded={false}>
-      <div className="border-b border-slate-100 p-4">
+      <div className="border-b border-line p-4">
         <Tabs
           value={status}
           onChange={(s) => (setStatus(s), setPage(1))}
@@ -91,13 +91,13 @@ function Refunds() {
               {q.data.items.map((r) => (
                 <tr key={r.id}>
                   <Td className="font-medium tabular">{r.booking?.code}</Td>
-                  <Td className="tabular text-slate-600">{fmtDateTime(r.createdAt)}</Td>
-                  <Td className="text-slate-600">{r.tierLabel}</Td>
-                  <Td className="max-w-56 text-slate-600">
+                  <Td className="tabular text-ink-2">{fmtDateTime(r.createdAt)}</Td>
+                  <Td className="text-ink-2">{r.tierLabel}</Td>
+                  <Td className="max-w-56 text-ink-2">
                     <div className="truncate" title={r.reason}>
                       {r.reason}
                     </div>
-                    {r.failureReason && <div className="truncate text-xs text-red-700">{r.failureReason}</div>}
+                    {r.failureReason && <div className="truncate text-xs text-danger">{r.failureReason}</div>}
                   </Td>
                   <Td className="text-right font-medium tabular">{inrFromPaise(r.amount)}</Td>
                   <Td>
@@ -132,7 +132,7 @@ function Payments() {
 
   return (
     <Card padded={false}>
-      <div className="border-b border-slate-100 p-4">
+      <div className="border-b border-line p-4">
         <Tabs
           value={status}
           onChange={(s) => (setStatus(s), setPage(1))}
@@ -167,13 +167,13 @@ function Payments() {
                 <tr key={p.id}>
                   <Td>
                     <div className="font-medium tabular">{p.booking.code}</div>
-                    <div className="text-xs text-slate-500">{p.provider === "FAKE" ? "Test gateway" : "Razorpay"}</div>
+                    <div className="text-xs text-ink-2">{p.provider === "FAKE" ? "Test gateway" : "Razorpay"}</div>
                   </Td>
-                  <Td className="text-xs tabular text-slate-600">
+                  <Td className="text-xs tabular text-ink-2">
                     <div>{p.providerPaymentId ?? "—"}</div>
-                    <div className="text-slate-400">{p.providerOrderId}</div>
+                    <div className="text-ink-3">{p.providerOrderId}</div>
                   </Td>
-                  <Td className="tabular text-slate-600">{fmtDateTime(p.paidAt)}</Td>
+                  <Td className="tabular text-ink-2">{fmtDateTime(p.paidAt)}</Td>
                   <Td className="text-right font-medium tabular">{inrFromPaise(p.amount)}</Td>
                   <Td>
                     <StatusBadge status={p.status} />

@@ -59,20 +59,20 @@ export function StaffPage() {
                 <tr key={a.id}>
                   <Td>
                     <div className="flex items-center gap-3">
-                      <div className="flex size-8 items-center justify-center rounded-full bg-navy-50 text-xs font-semibold text-navy-700">{initials(a.name)}</div>
+                      <div className="flex size-8 items-center justify-center rounded-full bg-info-bg text-xs font-semibold text-brand-ink">{initials(a.name)}</div>
                       <div>
-                        <div className="font-medium text-slate-900">
-                          {a.name} {a.id === me?.id && <span className="text-xs font-normal text-slate-500">(you)</span>}
+                        <div className="font-medium text-ink">
+                          {a.name} {a.id === me?.id && <span className="text-xs font-normal text-ink-2">(you)</span>}
                         </div>
-                        <div className="text-xs text-slate-500">{a.email}</div>
+                        <div className="text-xs text-ink-2">{a.email}</div>
                       </div>
                     </div>
                   </Td>
                   <Td>
                     <Badge tone={a.role === "SUPER_ADMIN" ? "navy" : "gray"}>{roleLabel[a.role]}</Badge>
                   </Td>
-                  <Td className="text-slate-600">{a.role === "LOCATION_ADMIN" ? a.cityIds.map(cityName).join(", ") : "All"}</Td>
-                  <Td className="text-slate-600">{fmtDate(a.createdAt)}</Td>
+                  <Td className="text-ink-2">{a.role === "LOCATION_ADMIN" ? a.cityIds.map(cityName).join(", ") : "All"}</Td>
+                  <Td className="text-ink-2">{fmtDate(a.createdAt)}</Td>
                   <Td>
                     {!a.active ? <Badge tone="red">Disabled</Badge> : a.lockedUntil && new Date(a.lockedUntil) > new Date() ? <Badge tone="amber">Locked</Badge> : <Badge tone="green">Active</Badge>}
                   </Td>
@@ -146,10 +146,10 @@ function AdminModal({ admin, cities, isSelf, onClose }: { admin: AdminUser | nul
         </SelectInput>
         {f.role === "LOCATION_ADMIN" && (
           <fieldset>
-            <legend className="mb-1.5 text-[13px] font-medium text-slate-700">Cities they manage</legend>
+            <legend className="mb-1.5 text-[13px] font-medium text-ink-2">Cities they manage</legend>
             <div className="flex flex-wrap gap-2">
               {cities.map((c) => (
-                <label key={c.id} className={`cursor-pointer rounded-full px-3 py-1.5 text-[13px] ring-1 ring-inset ${f.cityIds.includes(c.id) ? "bg-teal-50 text-teal-900 ring-teal-500" : "ring-slate-300 text-slate-700"}`}>
+                <label key={c.id} className={`cursor-pointer rounded-full px-3 py-1.5 text-[13px] ring-1 ring-inset ${f.cityIds.includes(c.id) ? "bg-primary-soft text-teal-900 ring-teal-500" : "ring-line-strong text-ink-2"}`}>
                   <input type="checkbox" className="sr-only" checked={f.cityIds.includes(c.id)} onChange={() => toggleCity(c.id)} />
                   {c.name}
                 </label>
@@ -167,7 +167,7 @@ function AdminModal({ admin, cities, isSelf, onClose }: { admin: AdminUser | nul
           error={err?.field("password")}
         />
         {admin && !isSelf && <Toggle label="Active" hint="Disabled admins are signed out at once and can't sign in." checked={f.active} onChange={(v) => setF({ ...f, active: v })} />}
-        {m.error && !err?.details?.fields && <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{errorMessage(m.error)}</p>}
+        {m.error && !err?.details?.fields && <p className="rounded-lg bg-danger-bg px-3 py-2 text-sm text-danger">{errorMessage(m.error)}</p>}
       </div>
     </Modal>
   );

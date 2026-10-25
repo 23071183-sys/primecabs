@@ -72,11 +72,11 @@ export function PlacesPage() {
               <div className="mb-3 flex items-start justify-between gap-2">
                 <div>
                   <div className="flex items-center gap-2">
-                    <h3 className="text-base font-semibold text-slate-900">{c.name}</h3>
+                    <h3 className="text-base font-semibold text-ink">{c.name}</h3>
                     <Badge tone={c.type === "HUB" ? "navy" : "gray"}>{c.type === "HUB" ? "Hub" : "Spoke"}</Badge>
                     {!c.active && <Badge tone="red">Inactive</Badge>}
                   </div>
-                  <p className="text-xs text-slate-500">
+                  <p className="text-xs text-ink-2">
                     {c.state}
                     {c.hubCityId && ` · served from ${cities.data.find((h) => h.id === c.hubCityId)?.name ?? "hub"}`}
                   </p>
@@ -88,22 +88,22 @@ export function PlacesPage() {
                 )}
               </div>
               {c.type === "SPOKE" && (
-                <p className="mb-3 flex items-center gap-2 rounded-lg bg-slate-50 px-3 py-2 text-xs text-slate-600">
+                <p className="mb-3 flex items-center gap-2 rounded-lg bg-muted px-3 py-2 text-xs text-ink-2">
                   <Home className="size-3.5" />
                   {c.homePickupAllowed ? `Home pickup within ${c.homePickupRadiusKm} km · ${c.homePickupFee ? `+${inrFromPaise(c.homePickupFee)}` : "free"}` : "No home pickup"}
                 </p>
               )}
               <ul className="space-y-1.5">
-                {c.pickupPoints.length === 0 && <li className="text-sm text-slate-500">No pickup points yet.</li>}
+                {c.pickupPoints.length === 0 && <li className="text-sm text-ink-2">No pickup points yet.</li>}
                 {c.pickupPoints.map((p) => (
                   <li key={p.id} className={`flex items-center gap-2 text-sm ${p.active ? "" : "opacity-50"}`}>
-                    <MapPin className="size-3.5 shrink-0 text-slate-400" />
-                    <span className="flex-1 truncate text-slate-800" title={p.name}>
+                    <MapPin className="size-3.5 shrink-0 text-ink-3" />
+                    <span className="flex-1 truncate text-ink" title={p.name}>
                       {p.name}
                     </span>
-                    <span className="text-xs text-slate-500">{p.extraFare ? `+${inrFromPaise(p.extraFare)}` : "Free"}</span>
+                    <span className="text-xs text-ink-2">{p.extraFare ? `+${inrFromPaise(p.extraFare)}` : "Free"}</span>
                     {edit && (
-                      <button onClick={() => setPointModal({ city: c, point: p })} className="text-xs font-medium text-teal-700 hover:underline">
+                      <button onClick={() => setPointModal({ city: c, point: p })} className="text-xs font-medium text-accent hover:underline">
                         Edit
                       </button>
                     )}
@@ -123,7 +123,7 @@ export function PlacesPage() {
       <Card className="mt-6" padded={false}>
         <div className="px-5 pt-5">
           <CardTitle>Routes and reference fares</CardTitle>
-          <p className="-mt-2 mb-4 text-sm text-slate-500">The reference fare per seat is shown next to a driver's proposed fare when you review rides.</p>
+          <p className="-mt-2 mb-4 text-sm text-ink-2">The reference fare per seat is shown next to a driver's proposed fare when you review rides.</p>
         </div>
         {!routes.data || !types.data ? (
           <div className="space-y-2 px-5 pb-5">
@@ -150,18 +150,18 @@ export function PlacesPage() {
             <tbody>
               {routes.data.map((r) => (
                 <tr key={r.id} className={r.active ? "" : "opacity-50"}>
-                  <Td className="font-medium text-slate-900">
+                  <Td className="font-medium text-ink">
                     <span className="flex items-center gap-1.5">
-                      {r.fromCity.name} <ArrowRight className="size-3.5 text-slate-400" /> {r.toCity.name}
+                      {r.fromCity.name} <ArrowRight className="size-3.5 text-ink-3" /> {r.toCity.name}
                       {!r.active && <Badge tone="red">Inactive</Badge>}
                     </span>
                   </Td>
-                  <Td className="text-right tabular text-slate-600">{r.distanceKm} km</Td>
-                  <Td className="text-right tabular text-slate-600">
+                  <Td className="text-right tabular text-ink-2">{r.distanceKm} km</Td>
+                  <Td className="text-right tabular text-ink-2">
                     {Math.floor(r.durationMinutes / 60)}h {String(r.durationMinutes % 60).padStart(2, "0")}m
                   </Td>
                   {types.data.filter((t) => t.active).map((t) => (
-                    <Td key={t.id} className="text-right tabular text-slate-700">
+                    <Td key={t.id} className="text-right tabular text-ink-2">
                       {inrFromPaise(r.fares.find((f) => f.vehicleTypeId === t.id)?.referenceSeatFare)}
                     </Td>
                   ))}
@@ -191,7 +191,7 @@ export function PlacesPage() {
 function FormError({ error }: { error: unknown }) {
   if (!error) return null;
   return (
-    <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700" role="alert">
+    <p className="rounded-lg bg-danger-bg px-3 py-2 text-sm text-danger" role="alert">
       {errorMessage(error)}
     </p>
   );
@@ -409,7 +409,7 @@ function RouteModal({ route, cities, types, onClose }: { route: Route | null; ci
           <TextInput label="and minutes" suffix="min" inputMode="numeric" value={f.minutes} onChange={(e) => setF({ ...f, minutes: e.target.value.replace(/\D/g, "").slice(0, 2) })} />
         </div>
         <div>
-          <p className="mb-2 text-[13px] font-medium text-slate-700">Reference fare per seat{route ? "" : " (both directions)"}</p>
+          <p className="mb-2 text-[13px] font-medium text-ink-2">Reference fare per seat{route ? "" : " (both directions)"}</p>
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
             {types.map((t) => (
               <TextInput key={t.id} label={t.name} prefix="₹" inputMode="decimal" value={fares[t.id] ?? ""} onChange={(e) => setFares({ ...fares, [t.id]: e.target.value })} />
