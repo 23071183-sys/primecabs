@@ -1,5 +1,6 @@
 // PrimeCabs design tokens. Navy for structure, teal for the one main action per screen.
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class Brand {
   static const navy = Color(0xFF143D75);
@@ -116,6 +117,7 @@ ThemeData pcTheme(Brightness brightness) {
     extensions: [c],
     appBarTheme: const AppBarTheme(
       backgroundColor: Brand.navy,
+      systemOverlayStyle: SystemUiOverlayStyle.light,
       foregroundColor: Colors.white,
       elevation: 0,
       centerTitle: false,

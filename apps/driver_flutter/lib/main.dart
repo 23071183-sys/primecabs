@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:primecabs_ui/primecabs_ui.dart';
 
@@ -19,6 +20,8 @@ class DriverApp extends ConsumerWidget {
       theme: pcTheme(Brightness.light),
       darkTheme: pcTheme(Brightness.dark),
       routerConfig: ref.watch(routerProvider),
+      // Every screen starts with a navy header, so the status bar text is always light.
+      builder: (context, child) => AnnotatedRegion<SystemUiOverlayStyle>(value: SystemUiOverlayStyle.light, child: child!),
     );
   }
 }
