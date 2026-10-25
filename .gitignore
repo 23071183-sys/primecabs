@@ -17,3 +17,8 @@ apps/api/storage-test/
 web-build/
 expo-env.d.ts
 .metro-health-check*
+
+# Flutter / Dart
+.dart_tool/
+.flutter-plugins-dependencies
+packages/*/pubspec.lock
