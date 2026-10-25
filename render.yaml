@@ -42,12 +42,11 @@ services:
       # No disk on the free plan, so documents live in the database (stored_files table).
       - key: STORAGE_PROVIDER
         value: database
-      # The admin portal's address (bare hostname is fine; https:// is added).
+      # The admin portal's public address. (Render's fromService "host" is the internal
+      # name, not the public one, so the address is written out. Change it if Render
+      # gives the site a different name, or when a custom domain is added.)
       - key: CORS_ORIGINS
-        fromService:
-          type: web
-          name: primecabs-admin
-          property: host
+        value: https://primecabs-admin.onrender.com
       - key: SMS_PROVIDER
         value: fake
       - key: PAYMENT_PROVIDER
@@ -94,11 +93,9 @@ services:
     envVars:
       - key: NODE_VERSION
         value: "24"
+      # The API's public address, baked into the build (see CORS_ORIGINS above for why).
       - key: VITE_API_URL
-        fromService:
-          type: web
-          name: primecabs-api
-          property: host
+        value: https://primecabs-api.onrender.com
 
 databases:
   - name: primecabs-db

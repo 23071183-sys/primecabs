@@ -31,7 +31,7 @@ Every push to `main` deploys automatically.
 4. Click **Apply**. The first build and start take about 5 to 10 minutes. When `primecabs-api` shows **Live**, open `https://primecabs-api.onrender.com/health`. It should show `{"ok":true}`.
 5. Open the admin portal at `https://primecabs-admin.onrender.com` and sign in with ADMIN_EMAIL / ADMIN_PASSWORD.
 
-If Render gives a service a different address (e.g. `primecabs-api-x1y2.onrender.com` when the name is taken), use that address in the steps below.
+If Render gives a service a different address (e.g. `primecabs-api-x1y2.onrender.com` when the name is taken), put the real addresses in `render.yaml` (`CORS_ORIGINS` on the API, `VITE_API_URL` on the admin site), push, and use them in the steps below. They are written out because Render's `fromService` host is the internal name, which browsers can't reach.
 
 ## Point the mobile apps at the hosted API
 
