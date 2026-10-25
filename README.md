@@ -10,8 +10,8 @@ Requirements: [docs/client_answers.md](docs/client_answers.md). Defaults and ope
 |---|---|---|
 | a | Backend, database, seed data, tests (`apps/api`) | Built |
 | b | Admin Portal (`apps/admin`) | Built |
-| c | Driver App (`apps/driver`) | Built |
-| d | Customer App (`apps/customer`) | Next |
+| c | Driver App: Flutter (`apps/driver_flutter`), earlier Expo version kept in `apps/driver` | Built |
+| d | Customer App: Flutter (`apps/customer_flutter`) | Built |
 
 ## Run it on this Mac
 
@@ -70,6 +70,26 @@ Run all tests (the database must be running):
 ```bash
 npm test
 ```
+
+### Flutter apps (Android and iPhone)
+
+The Flutter SDK is in `~/.local/flutter`. Add it to your shell once:
+
+```bash
+echo 'export PATH="$HOME/.local/flutter/bin:$PATH"' >> ~/.zprofile && source ~/.zprofile
+```
+
+With the API running, start an app on the iPhone Simulator (Xcode must be installed; `open -a Simulator` first):
+
+```bash
+cd apps/customer_flutter && flutter run -d "iPhone 18 Pro"
+```
+
+```bash
+cd apps/driver_flutter && flutter run -d "iPhone 18 Pro"
+```
+
+Or in Chrome with `flutter run -d chrome`. Both apps share `packages/primecabs_core` (API client, models, formatting) and `packages/primecabs_ui` (theme and widgets). Tests: `flutter test` in each app, and `dart test` in `packages/primecabs_core`. See each app's README for using the hosted API.
 
 ## Development accounts
 

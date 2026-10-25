@@ -104,7 +104,7 @@ class City {
   City.fromJson(Json j)
       : id = j['id'] as String,
         name = j['name'] as String,
-        state = j['state'] as String,
+        state = j['state'] as String? ?? '', // not sent with a ride's cities
         isHub = j['type'] == 'HUB',
         homePickupAllowed = j['homePickupAllowed'] as bool? ?? false,
         homePickupFee = j['homePickupFee'] as int? ?? 0,
@@ -263,9 +263,26 @@ class PublicConfig {
         bookingCutoffMinutes = j['bookingCutoffMinutes'] as int,
         seatHoldMinutes = j['seatHoldMinutes'] as int,
         supportPhone = (j['support'] as Json)['phone'] as String,
-        supportEmail = (j['support'] as Json)['email'] as String;
+        supportEmail = (j['support'] as Json)['email'] as String,
+        gstIncluded = (j['gst'] as Json?)?['mode'] != 'ADDED',
+        gstRatePercent = ((j['gst'] as Json?)?['ratePercent'] as num?) ?? 5,
+        refundPolicy = _list(j['refundPolicy'], RefundTier.fromJson);
   final int bookingHorizonDays, bookingCutoffMinutes, seatHoldMinutes;
   final String supportPhone, supportEmail;
+  final bool gstIncluded;
+  final num gstRatePercent;
+
+  /// Highest tier first, e.g. "24+ hours before: 100%".
+  final List<RefundTier> refundPolicy;
+}
+
+class RefundTier {
+  RefundTier.fromJson(Json j)
+      : minHoursBefore = (j['minHoursBefore'] as num).toInt(),
+        percent = (j['percent'] as num).toInt(),
+        label = j['label'] as String;
+  final int minHoursBefore, percent;
+  final String label;
 }
 
 /// Returned when a ride is created; the app offers to publish the return trip with these values.
@@ -282,3 +299,220 @@ class ReturnSuggestion {
 }
 
 DateTime? parseDate(Object? v) => _date(v);
+
+// ---------- Customer app ----------
+
+enum BookingStatus { held, confirmed, completed, cancelled, expired }
+
+class CustomerMe {
+  CustomerMe.fromJson(Json j)
+      : id = j['id'] as String,
+        phone = j['phone'] as String,
+        name = j['name'] as String?,
+        email = j['email'] as String?,
+        age = j['age'] as int?,
+        gender = j['gender'] as String?,
+        profileComplete = j['profileComplete'] as bool? ?? false;
+  final String id, phone;
+  final String? name, email, gender;
+  final int? age;
+  final bool profileComplete;
+}
+
+/// One ride in search results.
+class RideOption {
+  RideOption.fromJson(Json j)
+      : id = j['id'] as String,
+        departureAt = DateTime.parse(j['departureAt'] as String),
+        arrivalAt = DateTime.parse(j['arrivalAt'] as String),
+        durationMinutes = j['durationMinutes'] as int,
+        seatFare = j['seatFare'] as int,
+        availableSeats = j['availableSeats'] as int,
+        totalSeats = j['totalSeats'] as int,
+        vehicleType = j['vehicleType'] as String,
+        driverFirstName = j['driverFirstName'] as String,
+        available = j['available'] as bool,
+        unavailableReason = j['unavailableReason'] as String?;
+  final String id, vehicleType, driverFirstName;
+  final DateTime departureAt, arrivalAt;
+  final int durationMinutes, seatFare, availableSeats, totalSeats;
+  final bool available;
+
+  /// FULL, NOT_ENOUGH_SEATS or BOOKING_NOT_OPEN when [available] is false.
+  final String? unavailableReason;
+}
+
+class SearchResult {
+  SearchResult.fromJson(Json j)
+      : routeExists = j['routeId'] != null,
+        distanceKm = j['distanceKm'] as int?,
+        items = _list(j['items'], RideOption.fromJson);
+  final bool routeExists;
+  final int? distanceKm;
+  final List<RideOption> items;
+}
+
+/// A ride opened for booking, with the pickup and drop choices of both cities.
+class BookableRide {
+  BookableRide.fromJson(Json j)
+      : id = j['id'] as String,
+        departureAt = DateTime.parse(j['departureAt'] as String),
+        arrivalAt = DateTime.parse(j['arrivalAt'] as String),
+        seatFare = j['seatFare'] as int,
+        availableSeats = j['availableSeats'] as int,
+        totalSeats = j['totalSeats'] as int,
+        vehicleType = j['vehicleType'] as String,
+        driverFirstName = j['driverFirstName'] as String,
+        from = City.fromJson(j['from'] as Json),
+        to = City.fromJson(j['to'] as Json);
+  final String id, vehicleType, driverFirstName;
+  final DateTime departureAt, arrivalAt;
+  final int seatFare, availableSeats, totalSeats;
+  final City from, to;
+}
+
+/// Customer-facing price. GST is inside [total] when [gstIncluded].
+class Fare {
+  Fare.fromJson(Json j)
+      : seatFare = j['seatFare'] as int,
+        seats = j['seats'] as int,
+        seatsAmount = j['seatsAmount'] as int,
+        pickupExtra = j['pickupExtra'] as int,
+        dropExtra = j['dropExtra'] as int,
+        gstIncluded = j['gstMode'] != 'ADDED',
+        gstRatePercent = j['gstRatePercent'] as num,
+        gstAmount = j['gstAmount'] as int,
+        total = j['total'] as int;
+  final int seatFare, seats, seatsAmount, pickupExtra, dropExtra, gstAmount, total;
+  final bool gstIncluded;
+  final num gstRatePercent;
+}
+
+/// A booking just created: seats are held until [holdExpiresAt].
+class BookingHold {
+  BookingHold.fromJson(Json j)
+      : id = j['id'] as String,
+        code = j['code'] as String,
+        holdExpiresAt = DateTime.parse(j['holdExpiresAt'] as String),
+        fare = Fare.fromJson(j['fare'] as Json);
+  final String id, code;
+  final DateTime holdExpiresAt;
+  final Fare fare;
+}
+
+/// What the payment gateway needs. With provider FAKE the app uses the test checkout.
+class PaymentOrder {
+  PaymentOrder.fromJson(Json j)
+      : provider = j['provider'] as String,
+        keyId = j['keyId'] as String?,
+        orderId = j['orderId'] as String,
+        amount = j['amount'] as int,
+        bookingCode = j['bookingCode'] as String,
+        holdExpiresAt = DateTime.parse(j['holdExpiresAt'] as String);
+  final String provider, orderId, bookingCode;
+  final String? keyId;
+  final int amount;
+  final DateTime holdExpiresAt;
+  bool get isTest => provider == 'FAKE';
+}
+
+class TicketPassenger {
+  TicketPassenger.fromJson(Json j)
+      : id = j['id'] as String,
+        name = j['name'] as String,
+        age = j['age'] as int,
+        gender = j['gender'] as String,
+        status = _enum(PassengerStatus.values, j['status'] as String),
+        startCode = j['startCode'] as String?,
+        endCode = j['endCode'] as String?;
+  final String id, name, gender;
+  final int age;
+  final PassengerStatus status;
+  final String? startCode, endCode;
+}
+
+class Stop {
+  Stop.fromJson(Json j)
+      : point = j['point'] as String?,
+        address = j['address'] as String?;
+  final String? point, address;
+  String get label => point ?? address ?? '—';
+  bool get isHome => point == null && address != null;
+}
+
+/// The e-ticket.
+class Ticket {
+  Ticket.fromJson(Json j)
+      : id = j['id'] as String,
+        code = j['code'] as String,
+        status = _enum(BookingStatus.values, j['status'] as String),
+        holdExpiresAt = _date(j['holdExpiresAt']),
+        from = (j['ride'] as Json)['from'] as String,
+        to = (j['ride'] as Json)['to'] as String,
+        departureAt = DateTime.parse((j['ride'] as Json)['departureAt'] as String),
+        arrivalAt = DateTime.parse((j['ride'] as Json)['arrivalAt'] as String),
+        rideStatus = _enum(RideStatus.values, (j['ride'] as Json)['status'] as String),
+        pickup = Stop.fromJson(j['pickup'] as Json),
+        drop = Stop.fromJson(j['drop'] as Json),
+        driverName = (j['driver'] as Json?)?['name'] as String?,
+        driverPhone = (j['driver'] as Json?)?['phone'] as String?,
+        vehicleType = (j['vehicle'] as Json?)?['type'] as String?,
+        vehicleNo = (j['vehicle'] as Json?)?['registrationNo'] as String?,
+        vehicleName = j['vehicle'] == null
+            ? null
+            : [(j['vehicle'] as Json)['colour'], (j['vehicle'] as Json)['make'], (j['vehicle'] as Json)['model']].whereType<String>().join(' '),
+        passengers = _list(j['passengers'], TicketPassenger.fromJson),
+        fare = Fare.fromJson(j['fare'] as Json),
+        refunds = _list(j['refunds'], TicketRefund.fromJson),
+        supportPhone = (j['support'] as Json)['phone'] as String,
+        supportEmail = (j['support'] as Json)['email'] as String;
+  final String id, code, from, to, supportPhone, supportEmail;
+  final BookingStatus status;
+  final RideStatus rideStatus;
+  final DateTime? holdExpiresAt;
+  final DateTime departureAt, arrivalAt;
+  final Stop pickup, drop;
+  final String? driverName, driverPhone, vehicleType, vehicleNo, vehicleName;
+  final List<TicketPassenger> passengers;
+  final Fare fare;
+  final List<TicketRefund> refunds;
+}
+
+class TicketRefund {
+  TicketRefund.fromJson(Json j)
+      : amount = j['amount'] as int,
+        percent = j['percent'] as int,
+        status = j['status'] as String;
+  final int amount, percent;
+
+  /// PENDING, PROCESSED or FAILED
+  final String status;
+}
+
+/// A row in the Bookings tab.
+class BookingSummary {
+  BookingSummary.fromJson(Json j)
+      : id = j['id'] as String,
+        code = j['code'] as String,
+        status = _enum(BookingStatus.values, j['status'] as String),
+        seats = j['seats'] as int,
+        total = j['total'] as int,
+        from = j['from'] as String,
+        to = j['to'] as String,
+        departureAt = DateTime.parse(j['departureAt'] as String);
+  final String id, code, from, to;
+  final BookingStatus status;
+  final int seats, total;
+  final DateTime departureAt;
+}
+
+class CancelPreview {
+  CancelPreview.fromJson(Json j)
+      : cancellable = j['cancellable'] as bool,
+        refundAmount = j['refundAmount'] as int,
+        refundPercent = j['refundPercent'] as int,
+        tierLabel = j['tierLabel'] as String;
+  final bool cancellable;
+  final int refundAmount, refundPercent;
+  final String tierLabel;
+}

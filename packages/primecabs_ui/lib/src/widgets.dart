@@ -591,6 +591,8 @@ Future<T?> showPcSheet<T>(BuildContext context, {required String title, required
   return showModalBottomSheet<T>(
     context: context,
     isScrollControlled: true,
+    // Above the bottom tab bar, not inside the tab's own navigator.
+    useRootNavigator: true,
     useSafeArea: true,
     builder: (ctx) => Padding(
       padding: EdgeInsets.only(bottom: MediaQuery.of(ctx).viewInsets.bottom),

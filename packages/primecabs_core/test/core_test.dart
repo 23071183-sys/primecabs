@@ -208,4 +208,77 @@ void main() {
       expect(body, contains('content-type: image/png'));
     });
   });
+
+  group('customer models', () {
+    test('countdown never goes negative', () {
+      expect(countdown(299), '4:59');
+      expect(countdown(60), '1:00');
+      expect(countdown(5), '0:05');
+      expect(countdown(-3), '0:00');
+    });
+
+    test('config reads GST mode and the refund policy', () {
+      final c = PublicConfig.fromJson({
+        'bookingHorizonDays': 30,
+        'bookingCutoffMinutes': 15,
+        'seatHoldMinutes': 5,
+        'gst': {'mode': 'INCLUDED', 'ratePercent': 5},
+        'refundPolicy': [
+          {'minHoursBefore': 24, 'percent': 100, 'label': '24+ hours before: 100%'},
+          {'minHoursBefore': 0, 'percent': 0, 'label': 'Under 4 hours: 0%'},
+        ],
+        'support': {'phone': '+910000000000', 'email': 's@x.in'},
+      });
+      expect(c.gstIncluded, isTrue);
+      expect(c.refundPolicy.first.percent, 100);
+      expect(c.refundPolicy.last.label, 'Under 4 hours: 0%');
+    });
+
+    test('ticket hides driver details until confirmed and labels home stops', () {
+      Json ticket(String status) => {
+            'id': 'b1',
+            'code': 'PC-261026-1001',
+            'status': status,
+            'holdExpiresAt': status == 'HELD' ? '2026-10-26T01:05:00.000Z' : null,
+            'ride': {'id': 'r1', 'from': 'Seoni', 'to': 'Nagpur', 'departureAt': '2026-10-26T02:00:00.000Z', 'arrivalAt': '2026-10-26T04:45:00.000Z', 'status': 'OPEN'},
+            'pickup': {'point': null, 'address': 'House 12, Barapathar, Seoni'},
+            'drop': {'point': 'Nagpur Railway Station', 'address': null},
+            'driver': status == 'CONFIRMED' ? {'name': 'Ramesh Kumar', 'phone': '+919000000001'} : null,
+            'vehicle': status == 'CONFIRMED' ? {'type': 'Sedan', 'registrationNo': 'MH31AB1234', 'make': 'Maruti', 'model': 'Dzire', 'colour': null} : null,
+            'passengers': [
+              {'id': 'p1', 'name': 'Anita Sharma', 'age': 34, 'gender': 'FEMALE', 'status': 'BOOKED', 'startCode': status == 'CONFIRMED' ? '4821' : null, 'endCode': null},
+            ],
+            'fare': {'seatFare': 55000, 'seats': 1, 'seatsAmount': 55000, 'pickupExtra': 0, 'dropExtra': 0, 'gstMode': 'INCLUDED', 'gstRatePercent': 5, 'gstAmount': 2619, 'total': 55000},
+            'refunds': [],
+            'cancelledAt': null,
+            'support': {'phone': '+910000000000', 'email': 's@x.in'},
+          };
+      final held = Ticket.fromJson(ticket('HELD'));
+      expect(held.status, BookingStatus.held);
+      expect(held.holdExpiresAt, isNotNull);
+      expect(held.driverName, isNull);
+      expect(held.passengers.single.startCode, isNull);
+      expect(held.pickup.isHome, isTrue);
+      expect(held.drop.label, 'Nagpur Railway Station');
+
+      final ok = Ticket.fromJson(ticket('CONFIRMED'));
+      expect(ok.passengers.single.startCode, '4821');
+      expect(ok.vehicleName, 'Maruti Dzire');
+      expect(ok.fare.gstIncluded, isTrue);
+    });
+
+    test('search results keep unavailable rides with a reason', () {
+      final r = SearchResult.fromJson({
+        'routeId': 'rt',
+        'distanceKm': 130,
+        'items': [
+          {'id': 'a', 'departureAt': '2026-10-26T02:00:00Z', 'arrivalAt': '2026-10-26T04:45:00Z', 'durationMinutes': 165, 'seatFare': 55000, 'availableSeats': 0, 'totalSeats': 6, 'vehicleType': 'SUV', 'driverFirstName': 'Ramesh', 'available': false, 'unavailableReason': 'FULL'},
+        ],
+      });
+      expect(r.routeExists, isTrue);
+      expect(r.items.single.available, isFalse);
+      expect(r.items.single.unavailableReason, 'FULL');
+      expect(SearchResult.fromJson({'routeId': null, 'items': []}).routeExists, isFalse);
+    });
+  });
 }

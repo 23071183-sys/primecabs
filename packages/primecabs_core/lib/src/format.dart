@@ -110,3 +110,9 @@ String initials(String? name) {
   final s = words.map((w) => w[0].toUpperCase()).join();
   return s.isEmpty ? '?' : s;
 }
+
+/// Seat-hold countdown: "4:05". Never negative.
+String countdown(int seconds) {
+  final s = seconds < 0 ? 0 : seconds;
+  return '${s ~/ 60}:${(s % 60).toString().padLeft(2, '0')}';
+}
