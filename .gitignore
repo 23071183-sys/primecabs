@@ -22,3 +22,6 @@ expo-env.d.ts
 .dart_tool/
 .flutter-plugins-dependencies
 packages/*/pubspec.lock
+
+# Built Android apps for testers (shared directly, not committed)
+apk/
